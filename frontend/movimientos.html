@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitácora de Movimientos - Consumos</title>
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f0f4f8;
+        color: #333;
+        margin: 0;
+        padding: 20px 40px;
+    }
+
+    h1 {
+        text-align: center;
+        background-color: #004080;
+        color: white;
+        padding: 20px;
+        margin: 0 0 30px 0;
+        border-radius: 8px;
+        font-size: 24px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    form {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 64, 128, 0.1);
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px 30px;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .full-width {
+        grid-column: 1 / -1;
+    }
+
+    label {
+        font-weight: 600;
+        color: #004080;
+        margin-bottom: 8px;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #dbe5f1;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 14px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: #0059b3;
+        box-shadow: 0 0 0 2px #e6f0ff;
+    }
+    
+    textarea {
+        resize: vertical;
+        min-height: 60px;
+    }
+
+    .btn-container {
+        grid-column: 1 / -1;
+        text-align: center;
+    }
+
+    button {
+        background-color: #004080;
+        color: white;
+        border: none;
+        padding: 14px 35px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        margin-top: 20px;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+        background-color: #0059b3;
+        transform: translateY(-2px);
+    }
+
+    #feedback-message {
+        text-align: center;
+        padding: 15px;
+        margin-top: 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        display: none;
+    }
+    #feedback-message.success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    #feedback-message.error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+</style>
+</head>
+<body>
+
+<h1>Bitácora de Movimientos - Consumos 601</h1>
+
+<form id="bitacoraForm">
+    <div class="form-grid">
+        <div class="form-group">
+            <label for="referencia">Referencia (Código MP/ME)</label>
+            <input type="text" id="referencia" name="referencia" placeholder="Ingrese el código del producto" required>
+        </div>
+        <div class="form-group">
+            <label for="producto">Producto</label>
+            <input type="text" id="producto" name="producto" placeholder="Nombre del producto" required>
+        </div>
+        <div class="form-group">
+            <label for="lote">Lote</label>
+            <input type="text" id="lote" name="lote" placeholder="Número de lote" required>
+        </div>
+        <div class="form-group">
+            <label for="cantidad">Cantidad Consumida (Gr / Und)</label>
+            <input type="number" id="cantidad" name="cantidad" step="0.01" placeholder="Ingrese la cantidad" required>
+        </div>
+        <div class="form-group">
+            <label for="ubicacion">Ubicación</label>
+            <input type="text" id="ubicacion" name="ubicacion" placeholder="Ej: Estantería A3">
+        </div>
+        <div class="form-group">
+            <label for="bodega">Bodega</label>
+            <select id="bodega" name="bodega">
+                <option value="">Seleccione</option>
+                <option>Bodega Principal</option>
+                <option>Sótano 1</option>
+                <option>Sótano 2</option>
+                <option>Área de Producción</option>
+            </select>
+        </div>
+        <div class="form-group full-width">
+            <label for="observaciones">Observaciones</label>
+            <textarea id="observaciones" name="observaciones" rows="3" placeholder="Detalles u observaciones adicionales"></textarea>
+        </div>
+        <div class="btn-container">
+            <button type="submit">Guardar Movimiento</button>
+            <div id="feedback-message"></div>
+        </div>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('bitacoraForm');
+        const feedbackMessage = document.getElementById('feedback-message');
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            feedbackMessage.style.display = 'block';
+            feedbackMessage.className = '';
+            feedbackMessage.textContent = 'Guardando...';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/movimientos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    feedbackMessage.textContent = `¡Movimiento guardado exitosamente! ID: ${result.id_insertado}`;
+                    feedbackMessage.classList.add('success');
+                    form.reset();
+                } else {
+                    // El error de "saldo insuficiente" vendrá del backend
+                    throw new Error(result.message || 'Error al guardar el movimiento.');
+                }
+
+            } catch (error) {
+                feedbackMessage.textContent = `Error: ${error.message}`;
+                feedbackMessage.classList.add('error');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

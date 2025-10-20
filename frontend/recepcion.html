@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recepción de MP - ME</title>
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f0f4f8;
+        color: #333;
+        margin: 0;
+        padding: 20px 40px;
+    }
+
+    h1 {
+        text-align: center;
+        background-color: #004080;
+        color: white;
+        padding: 20px;
+        margin: 0 0 30px 0;
+        border-radius: 8px;
+        font-size: 24px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    form {
+        max-width: 1300px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 64, 128, 0.1);
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px 30px;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-weight: 600;
+        color: #004080;
+        margin-bottom: 8px;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #dbe5f1;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 14px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: #0059b3;
+        box-shadow: 0 0 0 2px #e6f0ff;
+    }
+    
+    textarea {
+        resize: vertical;
+        min-height: 50px;
+    }
+    
+    .section-title {
+        grid-column: 1 / -1; /* Ocupa todo el ancho */
+        background-color: #e6f0ff;
+        color: #004080;
+        font-weight: bold;
+        text-align: center;
+        padding: 12px;
+        border-radius: 6px;
+        margin-top: 20px;
+        font-size: 18px;
+    }
+
+    .btn-container {
+        grid-column: 1 / -1;
+        text-align: center;
+    }
+
+    button {
+        background-color: #004080;
+        color: white;
+        border: none;
+        padding: 14px 35px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        margin-top: 20px;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+        background-color: #0059b3;
+        transform: translateY(-2px);
+    }
+
+    /* Estilos para mensajes de feedback */
+    #feedback-message {
+        text-align: center;
+        padding: 15px;
+        margin-top: 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        display: none; /* Oculto por defecto */
+    }
+    #feedback-message.success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    #feedback-message.error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+</style>
+</head>
+<body>
+
+<h1>Recepción de Materia Prima y Material de Empaque</h1>
+
+<form id="recepcionForm">
+    <div class="form-grid">
+
+        <div class="form-group">
+            <label for="n_control_qc">N° Control QC</label>
+            <input type="text" id="n_control_qc" name="n_control_qc" required>
+        </div>
+        <div class="form-group">
+            <label for="cod_mp_me">Código MP / ME</label>
+            <input type="text" id="cod_mp_me" name="cod_mp_me" required>
+        </div>
+        <div class="form-group">
+            <label for="nombre_mp_me">Nombre de la MP / ME</label>
+            <input type="text" id="nombre_mp_me" name="nombre_mp_me" required>
+        </div>
+        <div class="form-group">
+            <label for="presentacion">Presentación</label>
+            <input type="text" id="presentacion" name="presentacion">
+        </div>
+        <div class="form-group">
+            <label for="cantidad_peso">Cant/Peso</label>
+            <input type="text" id="cantidad_peso" name="cantidad_peso" required>
+        </div>
+        <div class="form-group">
+            <label for="fecha_recepcion">Fecha Recepción</label>
+            <input type="date" id="fecha_recepcion" name="fecha_recepcion" readonly>
+        </div>
+        <div class="form-group">
+            <label for="responsable_qc">Resp. Aprob. QC</label>
+            <select id="responsable_qc" name="responsable_qc" required>
+                <option value="">Seleccione</option>
+                <option value="Persona 1">Persona 1</option>
+                <option value="Persona 2">Persona 2</option>
+                <option value="Persona 3">Persona 3</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="lote">Lote #</label>
+            <input type="text" id="lote" name="lote" required>
+        </div>
+        <div class="form-group">
+            <label for="fecha_vencimiento">F. Vencimiento</label>
+            <input type="date" id="fecha_vencimiento" name="fecha_vencimiento">
+        </div>
+        <div class="form-group">
+            <label for="n_orden_compra">N° Orden Compra</label>
+            <input type="text" id="n_orden_compra" name="n_orden_compra">
+        </div>
+        <div class="form-group">
+            <label for="fecha_oc">Fecha O.C</label>
+            <input type="date" id="fecha_oc" name="fecha_oc">
+        </div>
+        <div class="form-group">
+            <label for="tipo_insumo">Tipo Insumo</label>
+            <select id="tipo_insumo" name="tipo_insumo" required>
+                <option value="">Seleccione</option>
+                <option>Materia Prima</option>
+                <option>Material Empaque</option>
+                <option>Otro</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="total_unidades_peso">Total Unidades / Peso</label>
+            <input type="number" step="0.01" id="total_unidades_peso" name="total_unidades_peso" required>
+        </div>
+        <div class="form-group">
+            <label for="total_etiquetas">Total de Etiquetas</label>
+            <input type="number" id="total_etiquetas" name="total_etiquetas" required>
+        </div>
+        <div class="form-group">
+            <label for="placa_vehiculo">Placa Vehículo</label>
+            <input type="text" id="placa_vehiculo" name="placa_vehiculo">
+        </div>
+        <div class="form-group">
+            <label for="proveedor">Proveedor</label>
+            <input type="text" id="proveedor" name="proveedor">
+        </div>
+
+        <div class="section-title">Calificación de Proveedor</div>
+        
+        <div class="form-group">
+            <label>Calidad Producto</label>
+            <select name="calidad_producto" class="quality-check" required>
+                <option value="1">Sí</option>
+                <option value="0">No</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Oportunidad Entrega</label>
+            <select name="oportunidad_entrega" class="quality-check" required>
+                <option value="1">Sí</option>
+                <option value="0">No</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Cumplimiento Parámetros</label>
+            <select name="cumplimiento_parametros" class="quality-check" required>
+                <option value="1">Sí</option>
+                <option value="0">No</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Servicio</label>
+            <select name="servicio" class="quality-check" required>
+                <option value="1">Sí</option>
+                <option value="0">No</option>
+            </select>
+        </div>
+
+        <div class="form-group" style="grid-column: span 2;">
+            <label for="razon_nc">Razón de la No Conformidad</label>
+            <textarea id="razon_nc" name="razon_nc" rows="2" disabled></textarea>
+        </div>
+        <div class="form-group" style="grid-column: span 2;">
+            <label for="tratamiento_nc">Tratamiento de la No Conformidad</label>
+            <textarea id="tratamiento_nc" name="tratamiento_nc" rows="2" disabled></textarea>
+        </div>
+        
+        <div class="btn-container">
+            <button type="submit">Guardar Registro</button>
+            <div id="feedback-message"></div>
+        </div>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('recepcionForm');
+        const fechaRecepcionInput = document.getElementById('fecha_recepcion');
+        const fechaVencimientoInput = document.getElementById('fecha_vencimiento');
+        const qualityChecks = document.querySelectorAll('.quality-check');
+        const razonNcTextarea = document.getElementById('razon_nc');
+        const tratamientoNcTextarea = document.getElementById('tratamiento_nc');
+        const feedbackMessage = document.getElementById('feedback-message');
+
+        // --- AUTOMATIZACIÓN DE CAMPOS ---
+        
+        // 1. Establecer fecha de recepción a hoy
+        const hoy = new Date().toISOString().split('T')[0];
+        fechaRecepcionInput.value = hoy;
+
+        // 2. Calcular fecha de vencimiento (+6 meses)
+        const fechaVenc = new Date();
+        fechaVenc.setMonth(fechaVenc.getMonth() + 6);
+        fechaVencimientoInput.value = fechaVenc.toISOString().split('T')[0];
+
+        // --- LÓGICA DE CALIFICACIÓN DE PROVEEDOR ---
+
+        function toggleNcFields() {
+            let algunaRespuestaNo = false;
+            qualityChecks.forEach(select => {
+                if (select.value === '0') {
+                    algunaRespuestaNo = true;
+                }
+            });
+
+            razonNcTextarea.disabled = !algunaRespuestaNo;
+            tratamientoNcTextarea.disabled = !algunaRespuestaNo;
+        }
+
+        qualityChecks.forEach(select => select.addEventListener('change', toggleNcFields));
+        
+        // --- ENVÍO DEL FORMULARIO A LA API ---
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault(); // Evita que la página se recargue
+
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => {
+                // Convertir los valores de Sí/No a booleanos (true/false) para la API
+                if (['calidad_producto', 'oportunidad_entrega', 'cumplimiento_parametros', 'servicio'].includes(key)) {
+                    data[key] = value === '1';
+                } else {
+                    data[key] = value;
+                }
+            });
+
+            // Mostrar feedback al usuario
+            feedbackMessage.style.display = 'block';
+            feedbackMessage.className = '';
+            feedbackMessage.textContent = 'Guardando...';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/recepciones', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    feedbackMessage.textContent = `¡Registro guardado exitosamente! ID: ${result.id_insertado}`;
+                    feedbackMessage.classList.add('success');
+                    form.reset(); // Limpia el formulario
+                    // Volver a establecer fechas automáticas después de limpiar
+                    fechaRecepcionInput.value = hoy;
+                    fechaVencimientoInput.value = fechaVenc.toISOString().split('T')[0];
+                } else {
+                    throw new Error(result.message || 'Error al guardar el registro.');
+                }
+
+            } catch (error) {
+                feedbackMessage.textContent = `Error: ${error.message}`;
+                feedbackMessage.classList.add('error');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
