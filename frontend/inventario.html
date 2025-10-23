@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consulta de Inventario y Registros</title>
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f0f4f8;
+        color: #333;
+        margin: 0;
+        padding: 20px 40px;
+    }
+    .back-link {
+        display: inline-block;
+        margin-bottom: 15px;
+        color: #004080;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 16px;
+    }
+    .back-link:hover { text-decoration: underline; }
+    h1 {
+        text-align: center;
+        background-color: #004080;
+        color: white;
+        padding: 20px;
+        margin: 0 0 30px 0;
+        border-radius: 8px;
+    }
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 64, 128, 0.1);
+    }
+    .tabs {
+        display: flex;
+        border-bottom: 2px solid #dbe5f1;
+        margin-bottom: 25px;
+    }
+    .tab-button {
+        padding: 12px 25px;
+        cursor: pointer;
+        border: none;
+        background-color: transparent;
+        font-size: 18px;
+        font-weight: 600;
+        color: #555;
+        border-bottom: 3px solid transparent;
+        transition: 0.3s;
+    }
+    .tab-button.active {
+        color: #004080;
+        border-bottom-color: #004080;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #dbe5f1;
+        padding: 12px;
+        text-align: left;
+    }
+    th {
+        background-color: #e6f0ff;
+        color: #004080;
+    }
+    tbody tr:nth-child(even) { background-color: #f9fbfd; }
+</style>
+</head>
+<body>
+
+    <a href="index.html" class="back-link">← Volver al Panel Principal</a>
+    <h1>Inventario y Registros</h1>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'Saldos')">Saldos de Inventario</button>
+            <button class="tab-button" onclick="openTab(event, 'Recepciones')">Historial de Recepciones</button>
+            <button class="tab-button" onclick="openTab(event, 'Movimientos')">Historial de Movimientos</button>
+        </div>
+
+        <div id="Saldos" class="tab-content active">
+            <table id="tabla-saldos">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre Producto</th>
+                        <th>Saldo Actual</th>
+                        <th>Ubicación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+
+        <div id="Recepciones" class="tab-content">
+            <table id="tabla-recepciones">
+                <thead>
+                    <tr>
+                        <th>Cód. Producto</th>
+                        <th>Nombre</th>
+                        <th>Lote</th>
+                        <th>Cantidad Recibida</th>
+                        <th>Fecha Recepción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+
+        <div id="Movimientos" class="tab-content">
+            <table id="tabla-movimientos">
+                <thead>
+                    <tr>
+                        <th>Referencia</th>
+                        <th>Producto</th>
+                        <th>Lote</th>
+                        <th>Cantidad Consumida</th>
+                        <th>Fecha Movimiento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+<script>
+    const API_URL = 'http://localhost:3000/api';
+
+    // --- Lógica de Pestañas ---
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tab-button");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+
+    // --- Carga de Datos ---
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarSaldos();
+        cargarRecepciones();
+        cargarMovimientos();
+        // Activar la primera pestaña por defecto
+        document.querySelector('.tab-button').click();
+    });
+
+    // Cargar Saldos
+    async function cargarSaldos() {
+        const response = await fetch(`${API_URL}/inventario`);
+        const data = await response.json();
+        const tbody = document.querySelector('#tabla-saldos tbody');
+        tbody.innerHTML = '';
+        data.forEach(item => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${item.codigo_referencia}</td>
+                    <td>${item.nombre_producto}</td>
+                    <td>${item.saldo}</td>
+                    <td>${item.ubicacion}</td>
+                </tr>
+            `;
+        });
+    }
+
+    // Cargar Recepciones
+    async function cargarRecepciones() {
+        const response = await fetch(`${API_URL}/recepciones`);
+        const data = await response.json();
+        const tbody = document.querySelector('#tabla-recepciones tbody');
+        tbody.innerHTML = '';
+        data.forEach(item => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${item.cod_mp_me}</td>
+                    <td>${item.nombre_mp_me}</td>
+                    <td>${item.lote}</td>
+                    <td>${item.total_unidades_peso}</td>
+                    <td>${new Date(item.fecha_recepcion).toLocaleDateString()}</td>
+                </tr>
+            `;
+        });
+    }
+
+    // Cargar Movimientos
+    async function cargarMovimientos() {
+        const response = await fetch(`${API_URL}/movimientos`);
+        const data = await response.json();
+        const tbody = document.querySelector('#tabla-movimientos tbody');
+        tbody.innerHTML = '';
+        data.forEach(item => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${item.referencia}</td>
+                    <td>${item.producto}</td>
+                    <td>${item.lote}</td>
+                    <td>${item.cantidad}</td>
+                    <td>${new Date(item.fecha_movimiento).toLocaleDateString()}</td>
+                </tr>
+            `;
+        });
+    }
+</script>
+
+</body>
+</html>

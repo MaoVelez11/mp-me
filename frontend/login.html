@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iniciar Sesión - Panel de Aplicaciones</title>
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f0f4f8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .login-container {
+        background-color: #ffffff;
+        padding: 40px 50px;
+        border-radius: 12px;
+        box-shadow: 0 5px 25px rgba(0, 64, 128, 0.15);
+        width: 380px;
+        text-align: center;
+    }
+    .login-container h1 {
+        color: #004080;
+        font-size: 28px;
+        margin-top: 0;
+        margin-bottom: 30px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #334d6e;
+        margin-bottom: 8px;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #dbe5f1;
+        border-radius: 8px;
+        box-sizing: border-box; /* Asegura que el padding no afecte el ancho */
+        font-size: 16px;
+    }
+    .form-group input:focus {
+        outline: none;
+        border-color: #0059b3;
+        box-shadow: 0 0 0 3px #e6f0ff;
+    }
+    button {
+        width: 100%;
+        background-color: #004080;
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: 600;
+        margin-top: 10px;
+        transition: background-color 0.3s;
+    }
+    button:hover {
+        background-color: #0059b3;
+    }
+    #error-message {
+        color: #721c24;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 20px;
+        display: none; /* Oculto por defecto */
+    }
+</style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>Iniciar Sesión</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="usuario">Usuario</label>
+                <input type="text" id="usuario" name="usuario" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Acceder</button>
+            <div id="error-message"></div>
+        </form>
+    </div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const form = event.target;
+        const usuario = form.usuario.value;
+        const password = form.password.value;
+        const errorMessage = document.getElementById('error-message');
+        
+        errorMessage.style.display = 'none';
+
+        try {
+            const response = await fetch('http://localhost:3000/api/users/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ usuario, password })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                // Si el servidor responde con un error (401, 500, etc.)
+                throw new Error(data.message || 'Error al iniciar sesión.');
+            }
+
+            // --- ¡ÉXITO! ---
+            // 1. Guarda el token en el almacenamiento del navegador
+            localStorage.setItem('authToken', data.token);
+            
+            // 2. Redirige al panel principal
+            window.location.href = 'index.html';
+
+        } catch (error) {
+            errorMessage.textContent = error.message;
+            errorMessage.style.display = 'block';
+        }
+    });
+</script>
+
+</body>
+</html>

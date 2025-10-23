@@ -36,23 +36,32 @@
     }
 
     .sidebar a {
-        color: #334d6e;
-        text-decoration: none;
-        padding: 15px 20px;
-        margin: 8px 0;
-        border-radius: 8px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 15px; /* Space between icon and text */
-        transition: background-color 0.3s, color 0.3s;
-    }
+    color: #334d6e;
+    text-decoration: none;
+    padding: 15px 20px;
+    margin: 8px 0;
+    border-radius: 10px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 15px; 
+    transition: background-color 0.3s, color 0.3s;
+    
+}
 
-    .sidebar a:hover, .sidebar a.active {
-        background-color: #e6f0ff;
+    .sidebar a:hover {
+        background-color: #f0f4f8; /* Un hover sutil */
         color: #004080;
     }
+    
+    .sidebar a.active {
+    background-color: #e6f0ff;
+    color: #004080;
+    }
 
+    .sidebar a .icon {
+        font-size: 20px;
+    }
     /* --- Main Content Area --- */
     .main-content {
         flex: 1;
@@ -117,10 +126,19 @@
 
     <div class="sidebar">
         <div class="logo">EMPRESA</div>
-        <a href="#" class="active">📊 Panel Principal</a>
-        <a href="#">📦 Inventario</a>
-        <a href="#">📋 Maestros</a>
-        <a href="#">⚙️ Configuración</a>
+        
+        <a href="index.html" class="active">
+            <span class="icon">📧</span> Correos
+        </a>
+        <a href="inventario.html">
+            <span class="icon">📦</span> Inventario
+        </a>
+        <a href="maestros.html">
+            <span class="icon">📋</span> Maestros
+        </a>
+        <a href="#">
+            <span class="icon">⚙️</span> Configuración
+        </a>
     </div>
 
     <div class="main-content">

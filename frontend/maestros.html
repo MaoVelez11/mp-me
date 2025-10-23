@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script>
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            // Si no hay token, no puede estar aquí
+            alert('Acceso denegado. Debe iniciar sesión como administrador.');
+            window.location.href = 'login.html';
+        }
+    </script>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo de Maestros</title>
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f0f4f8;
+        color: #333;
+        margin: 0;
+        padding: 20px 40px;
+    }
+    .back-link {
+        display: inline-block; margin-bottom: 15px; color: #004080;
+        text-decoration: none; font-weight: 600; font-size: 16px;
+    }
+    .back-link:hover { text-decoration: underline; }
+    h1 {
+        text-align: center; background-color: #004080; color: white;
+        padding: 20px; margin: 0 0 30px 0; border-radius: 8px;
+    }
+    .container {
+        max-width: 900px; margin: 0 auto; background: white;
+        padding: 30px 40px; border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 64, 128, 0.1);
+    }
+    .section-title {
+        color: #004080; font-weight: 700; font-size: 20px;
+        border-bottom: 2px solid #e6f0ff; padding-bottom: 10px; margin-bottom: 20px;
+    }
+    .form-group { margin-bottom: 20px; }
+    label {
+        display: block; font-weight: 600; color: #334d6e; margin-bottom: 8px;
+    }
+    select, input[type="file"] {
+        width: 100%; padding: 10px; border: 1px solid #dbe5f1;
+        border-radius: 6px; box-sizing: border-box; font-size: 14px;
+    }
+    button {
+        background-color: #004080; color: white; border: none;
+        padding: 12px 25px; border-radius: 8px; cursor: pointer;
+        font-size: 16px; font-weight: 600;
+    }
+    button:hover { background-color: #0059b3; }
+    #feedback-message { margin-top: 20px; display: none; }
+    #feedback-message.success { color: #155724; }
+    #feedback-message.error { color: #721c24; }
+</style>
+</head>
+<body>
+
+    <a href="index.html" class="back-link">← Volver al Panel Principal</a>
+    <h1>Módulo de Maestros</h1>
+
+    <div class="container">
+        <h2 class="section-title">Carga de Datos desde Excel</h2>
+        
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="tipo_dato">¿Qué tabla deseas cargar?</label>
+                <select id="tipo_dato" name="tipo_dato">
+                    <option value="inventario">Inventario (Maestro de Productos)</option>
+                    <option value="recepciones">Recepciones (Histórico)</option>
+                    <option value="movimientos">Movimientos (Histórico)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="archivoExcel">Seleccionar archivo (.xlsx)</label>
+                <input type="file" id="archivoExcel" name="archivoExcel" accept=".xlsx" required>
+            </div>
+            
+            <button type="submit">Subir Archivo</button>
+        </form>
+        
+        <div id="feedback-message"></div>
+    </div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        
+        const form = event.target;
+        const formData = new FormData(form);
+        const feedback = document.getElementById('feedback-message');
+        
+        // Obtenemos el token guardado en el login
+        const token = localStorage.getItem('authToken');
+
+        // Si por alguna razón el token desapareció, detenemos
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        feedback.style.display = 'block';
+        feedback.className = '';
+        feedback.textContent = 'Subiendo y procesando archivo...';
+
+        try {
+            // (AÚN NO HEMOS CREADO ESTE ENDPOINT EN EL BACKEND)
+            const response = await fetch('http://localhost:3000/api/maestros/upload', {
+                method: 'POST',
+                // ======================================================
+                // AUTENTICACIÓN: Enviamos el token en los encabezados
+                // ======================================================
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                // ======================================================
+                body: formData // Enviamos el archivo
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Error al subir el archivo.');
+            }
+
+            feedback.textContent = result.message;
+            feedback.classList.add('success');
+            form.reset();
+
+        } catch (error) {
+            feedback.textContent = `Error: ${error.message}`;
+            feedback.classList.add('error');
+        }
+    });
+</script>
+
+</body>
+</html>

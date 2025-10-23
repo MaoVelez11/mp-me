@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script>
+        if (!token) { // <--- ¡Sin comillas!
+    alert('Acceso denegado. Debe iniciar sesión como administrador.');
+    window.location.href = 'login.html';
+}
+    </script>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo de Configuración</title>
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f0f4f8;
+        color: #333;
+        margin: 0;
+        padding: 20px 40px;
+    }
+    .back-link {
+        display: inline-block;
+        margin-bottom: 15px;
+        color: #004080;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 16px;
+    }
+    .back-link:hover { text-decoration: underline; }
+    h1 {
+        text-align: center;
+        background-color: #004080;
+        color: white;
+        padding: 20px;
+        margin: 0 0 30px 0;
+        border-radius: 8px;
+    }
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 64, 128, 0.1);
+        margin-bottom: 30px;
+    }
+    .section-title {
+        color: #004080;
+        font-weight: 700;
+        font-size: 20px;
+        border-bottom: 2px solid #e6f0ff;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 100px;
+        gap: 15px;
+        align-items: flex-end;
+    }
+    .form-group {
+        margin-bottom: 0;
+    }
+    label {
+        display: block;
+        font-weight: 600;
+        color: #334d6e;
+        margin-bottom: 8px;
+    }
+    input[type="text"], input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #dbe5f1;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+    button {
+        background-color: #004080;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        height: 38px;
+    }
+    button:hover { background-color: #0059b3; }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+    th, td {
+        border: 1px solid #dbe5f1;
+        padding: 12px;
+        text-align: left;
+    }
+    th {
+        background-color: #e6f0ff;
+        color: #004080;
+    }
+    
+    .action-btn {
+        background-color: #555;
+        font-size: 12px;
+        padding: 8px 12px;
+        margin-right: 5px;
+    }
+    .action-btn.delete { background-color: #c82333; }
+    .action-btn:hover { background-color: #333; }
+    .action-btn.delete:hover { background-color: #a71d2a; }
+</style>
+</head>
+<body>
+
+    <a href="index.html" class="back-link">← Volver al Panel Principal</a>
+    <h1>Gestión de Usuarios</h1>
+
+    <div class="container">
+        <h2 class="section-title">Agregar Nuevo Usuario</h2>
+        <form id="addUserForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="usuario">Nuevo Usuario</label>
+                    <input type="text" id="usuario" name="usuario" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Agregar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="container">
+        <h2 class="section-title">Usuarios Actuales</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="user-list-body">
+                <tr><td colspan="2">Cargando...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+<script>
+    // Define las variables globales
+    const API_URL = 'http://localhost:3000/api';
+    const token = localStorage.getItem('authToken');
+
+    // Al cargar la página, buscamos la lista de usuarios
+    document.addEventListener('DOMContentLoaded', () => {
+        loadUsers();
+    });
+
+    // --- 1. CARGAR LISTA DE USUARIOS ---
+    async function loadUsers() {
+        const tbody = document.getElementById('user-list-body');
+        try {
+            const response = await fetch(`${API_URL}/users`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (response.status === 401) { // Token inválido o expirado
+                 alert('Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.');
+                 window.location.href = 'login.html';
+                 return;
+            }
+            if (!response.ok) {
+                throw new Error('No se pudo cargar la lista de usuarios.');
+            }
+            
+            const users = await response.json();
+            tbody.innerHTML = ''; // Limpiar la tabla
+
+            users.forEach(user => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${user.usuario}</td>
+                        <td>
+                            <button class="action-btn" onclick="changePassword(${user.id_usuario}, '${user.usuario}')">
+                                Cambiar Contraseña
+                            </button>
+                            <button class="action-btn delete" onclick="deleteUser(${user.id_usuario}, '${user.usuario}')">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        } catch (error) {
+            tbody.innerHTML = `<tr><td colspan="2" style="color: red;">${error.message}</td></tr>`;
+        }
+    }
+
+    // --- 2. AGREGAR NUEVO USUARIO ---
+    document.getElementById('addUserForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const usuarioInput = document.getElementById('usuario');
+        const passwordInput = document.getElementById('password');
+
+        if (!usuarioInput.value || !passwordInput.value) {
+            return alert('Debe completar ambos campos.');
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/users`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    usuario: usuarioInput.value, 
+                    password: passwordInput.value 
+                })
+            });
+
+            if (!response.ok) {
+                 const errorData = await response.json();
+                 throw new Error(errorData.message || 'Error al crear el usuario.');
+            }
+            
+            alert('¡Usuario creado exitosamente!');
+            usuarioInput.value = ''; // Limpiar campos
+            passwordInput.value = ''; // Limpiar campos
+            loadUsers(); // Recargamos la lista
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+
+    // --- 3. CAMBIAR CONTRASEÑA (EDITAR) ---
+    async function changePassword(userId, username) {
+        const newPassword = prompt(`Ingrese la NUEVA contraseña para el usuario '${username}':`);
+        if (!newPassword || newPassword.trim() === '') {
+            return; // Si el usuario cancela o no escribe nada
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ password: newPassword })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al actualizar la contraseña.');
+            }
+            
+            alert('¡Contraseña actualizada exitosamente!');
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    // --- 4. ELIMINAR USUARIO (CÓDIGO CORREGIDO) ---
+    async function deleteUser(userId, username) {
+        
+        // Lógica simple: No permitimos borrar el usuario 'admin'
+        // (Esto es una capa extra de seguridad)
+        if (username === 'admin') {
+            return alert('No se puede eliminar al usuario administrador principal.');
+        }
+
+        if (!confirm(`¿Está seguro de que desea eliminar al usuario '${username}'? Esta acción no se puede deshacer.`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/users/${userId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al eliminar el usuario.');
+            }
+            
+            alert('¡Usuario eliminado exitosamente!');
+            loadUsers(); // Recargamos la lista
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+</script>
+
+</body>
+</html>
