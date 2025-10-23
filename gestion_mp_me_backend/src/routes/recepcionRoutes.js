@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const recepcionController = require('../controllers/recepcionController');
 
-// Ruta para crear una nueva recepción
-// POST /api/recepciones
+// ... (rutas POST y GET existentes)
 router.post('/', recepcionController.crearRecepcion);
+router.get('/', recepcionController.obtenerRecepciones);
 
-// Ruta para obtener todas las recepciones
-// GET /api/recepciones
-router.get('/', recepcionController.obtenerRecepciones); // <--- AÑADE ESTA LÍNEA
+// --- AÑADE ESTA LÍNEA AL FINAL ---
+// GET /api/recepciones/next-qc
+router.get('/next-qc', recepcionController.getNextQC);
 
 module.exports = router;
