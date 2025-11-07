@@ -1,41 +1,114 @@
 const db = require('../config/database');
 
 const Movimiento = {
-
+  
   /**
-   * Inserta un nuevo registro de movimiento en la base de datos.
-   * @param {object} movimientoData - Los datos del movimiento a guardar.
-   * @param {object} connection - La conexión de la base de datos para la transacción.
-   * @returns {Promise<object>} El resultado de la inserción.
+   * Crea un nuevo movimiento
    */
-  crear: async (movimientoData, connection) => {
-    const query = `
-      INSERT INTO bitacora_movimientos (
-        referencia, producto, lote, cantidad, observaciones, ubicacion, bodega
-      ) VALUES (?, ?, ?, ?, ?, ?, ?);
-    `;
+  crear: async (movimientoData) => {
+    const connection = await db.getConnection();
+    try {
+      await connection.beginTransaction();
 
-    const values = [
-      movimientoData.referencia,
-      movimientoData.producto,
-      movimientoData.lote,
-      movimientoData.cantidad,
-      movimientoData.observaciones,
-      movimientoData.ubicacion,
-      movimientoData.bodega
-    ];
+      // 1. Obtener la suma (bitácora) actual para esa referencia
+      const [rows] = await connection.query(
+        'SELECT SUM(cantidad) as total FROM movimientos WHERE referencia = ?', 
+        [movimientoData.referencia]
+      );
+      const bitacoraActual = rows[0].total || 0;
+      
+      // 2. Calcular la nueva bitácora (suma acumulada)
+      const nuevaBitacora = parseFloat(bitacoraActual) + parseFloat(movimientoData.cantidad);
 
-    // Ejecuta la consulta usando la conexión de la transacción
-    const [resultado] = await connection.query(query, values);
-    return resultado;
+      // 3. Insertar el nuevo movimiento
+      const query = `
+        INSERT INTO movimientos (
+          referencia, producto, lote, cantidad, bitacora, fecha_creacion, estado
+        ) VALUES (?, ?, ?, ?, ?, ?, 'abierto');
+      `;
+      
+      const fecha_creacion = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+      const values = [
+        movimientoData.referencia,
+        movimientoData.producto,
+        movimientoData.lote,
+        movimientoData.cantidad,
+        nuevaBitacora, // Guardamos la nueva suma
+        fecha_creacion
+      ];
+      
+      const [resultado] = await connection.query(query, values);
+      
+      // 4. Actualizar la bitácora en TODOS los registros de esa referencia
+      await connection.query(
+        'UPDATE movimientos SET bitacora = ? WHERE referencia = ?',
+        [nuevaBitacora, movimientoData.referencia]
+      );
+
+      await connection.commit();
+      return resultado;
+
+    } catch (error) {
+      await connection.rollback();
+      throw error; // Lanza el error para el controlador
+    } finally {
+      connection.release();
+    }
   },
 
   /**
-   * Obtiene todos los registros de la tabla bitacora_movimientos.
-   * @returns {Promise<Array>} Un array con todos los movimientos.
+   * Obtiene todos los movimientos (para la tabla principal)
    */
   obtenerTodos: async () => {
-    const query = 'SELECT * FROM bitacora_movimientos ORDER BY id_movimiento DESC;';
+    console.log("[DEBUG MODEL] Ejecutando query a la BD..."); // <--- LOG MODELO
+    // ¡ASEGÚRATE QUE DIGA 'movimientos' Y NO 'bitacora_movimientos'!
+    const query = 'SELECT * FROM movimientos ORDER BY id_movimiento DESC;';
+    const [rows] = await db.query(query);
+    console.log("[DEBUG MODEL] Query terminada."); // <--- LOG MODELO
+    return rows;
+  },
+
+  /**
+   * Lógica para "Cerrar Día"
+   */
+  cerrarDia: async () => {
+    const connection = await db.getConnection();
+    try {
+      await connection.beginTransaction();
+
+      // 1. Borrar las etiquetas viejas
+      await connection.query('DELETE FROM etiquetas_movimientos;');
+
+      // 2. Copiar todos los movimientos 'abiertos' a la tabla de etiquetas
+      const copyQuery = `
+        INSERT INTO etiquetas_movimientos (referencia, producto, lote, cantidad, bitacora, fecha_creacion)
+        SELECT referencia, producto, lote, cantidad, bitacora, fecha_creacion
+        FROM movimientos
+        WHERE estado = 'abierto';
+      `;
+      await connection.query(copyQuery);
+
+      // 3. Marcar todos los movimientos 'abiertos' como 'cerrados'
+      const updateQuery = "UPDATE movimientos SET estado = 'cerrado' WHERE estado = 'abierto';";
+      await connection.query(updateQuery);
+
+      await connection.commit();
+      return { message: 'Día cerrado y etiquetas generadas.' };
+
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  },
+
+  /**
+   * Obtiene las etiquetas generadas
+   */
+  obtenerEtiquetas: async () => {
+    const query = 'SELECT * FROM etiquetas_movimientos ORDER BY referencia;';
     const [rows] = await db.query(query);
     return rows;
   }

@@ -1,12 +1,8 @@
 const db = require('../config/database');
 
 const Recepcion = {
-  
-  /**
-   * Inserta un nuevo registro (sin n_control_qc).
-   */
+  // Crea el registro sin el consecutivo
   crear: async (recepcionData, connection) => {
-    // La consulta SQL ya NO incluye n_control_qc
     const query = `
       INSERT INTO recepciones (
         cod_mp_me, nombre_mp_me, presentacion, cantidad_peso, 
@@ -36,32 +32,29 @@ const Recepcion = {
     return resultado;
   },
 
-  /**
-   * Actualiza el n_control_qc usando el ID.
-   */
+  // Actualiza el consecutivo una vez creado el registro
   setControlQC: async (id, qcNumber, connection) => {
     const query = 'UPDATE recepciones SET n_control_qc = ? WHERE id_recepcion = ?;';
     await connection.query(query, [qcNumber, id]);
   },
 
-  /**
-   * Obtiene todos los registros.
-   */
   obtenerTodas: async () => {
     const query = 'SELECT * FROM recepciones ORDER BY id_recepcion DESC;';
     const [rows] = await db.query(query);
     return rows;
   },
 
-  /**
-   * Obtiene el último ID de recepción insertado.
-   */
   getLatestId: async () => {
     const query = 'SELECT MAX(id_recepcion) as maxId FROM recepciones;';
     const [rows] = await db.query(query);
     return rows[0];
+  },
+
+  getById: async (id) => {
+     const query = 'SELECT * FROM recepciones WHERE id_recepcion = ? OR n_control_qc = ?;';
+     const [rows] = await db.query(query, [id, id]);
+     return rows[0] || null;
   }
-  
 };
 
 module.exports = Recepcion;

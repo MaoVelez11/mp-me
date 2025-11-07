@@ -1,39 +1,33 @@
 const db = require('../config/database');
 
 const Inventario = {
-  /**
-   * Busca un producto en el inventario por su código.
-   * Si no existe, lo crea con saldo inicial cero.
-   * @param {string} codigo - El código del producto (cod_mp_me o referencia).
-   * @param {string} nombre - El nombre del producto.
-   * @param {object} connection - La conexión de la BD para la transacción.
-   * @returns {Promise<object>} El registro del inventario del producto.
-   */
-  buscarOCrear: async (codigo, nombre, connection) => {
-    // Primero, intenta encontrar el producto
-    let [rows] = await connection.query('SELECT * FROM inventario WHERE codigo_referencia = ?', [codigo]);
+  // Obtener todo para la tabla visual
+  obtenerTodo: async () => {
+    const query = 'SELECT * FROM inventario ORDER BY nombre_producto ASC;';
+    const [rows] = await db.query(query);
+    return rows;
+  },
 
-    // Si no existe, lo creamos
-    if (rows.length === 0) {
-      await connection.query(
-        'INSERT INTO inventario (codigo_referencia, nombre_producto, saldo) VALUES (?, ?, 0)',
-        [codigo, nombre]
-      );
-      // Volvemos a buscarlo para tener el registro completo
-      [rows] = await connection.query('SELECT * FROM inventario WHERE codigo_referencia = ?', [codigo]);
-    }
+  // Buscar un producto específico
+  obtenerPorCodigo: async (codigo) => {
+    const query = 'SELECT * FROM inventario WHERE codigo_referencia = ?;';
+    const [rows] = await db.query(query, [codigo]);
     return rows[0];
   },
 
-  /**
-   * Actualiza el saldo de un producto específico.
-   * @param {string} codigo - El código del producto.
-   * @param {number} nuevoSaldo - El nuevo saldo a establecer.
-   * @param {object} connection - La conexión de la BD para la transacción.
-   */
-  actualizarSaldo: async (codigo, nuevoSaldo, connection) => {
-    const query = 'UPDATE inventario SET saldo = ? WHERE codigo_referencia = ?;';
-    await connection.query(query, [nuevoSaldo, codigo]);
+  // Función principal para actualizar stock (usada por Recepción y Movimientos)
+  actualizarStock: async (codigo, nombre, cantidad, ubicacion, bodega, connection) => {
+    const conn = connection || db;
+    const query = `
+      INSERT INTO inventario (codigo_referencia, nombre_producto, saldo, ubicacion, bodega)
+      VALUES (?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        saldo = saldo + VALUES(saldo),
+        ubicacion = COALESCE(VALUES(ubicacion), ubicacion),
+        bodega = COALESCE(VALUES(bodega), bodega),
+        nombre_producto = VALUES(nombre_producto);
+    `;
+    await conn.query(query, [codigo, nombre, cantidad, ubicacion, bodega]);
   }
 };
 

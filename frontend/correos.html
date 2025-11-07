@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Envío de Correos</title>
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8;
+        color: #333; margin: 0; padding: 20px 40px;
+    }
+    .back-link {
+        display: inline-block; margin-bottom: 15px; color: #004080;
+        text-decoration: none; font-weight: 600; font-size: 16px;
+    }
+    .back-link:hover { text-decoration: underline; }
+    h1 {
+        text-align: center; background-color: #004080; color: white;
+        padding: 20px; margin: 0 0 30px 0; border-radius: 8px;
+    }
+    .container {
+        max-width: 800px; margin: 0 auto 30px auto; background: white;
+        padding: 30px 40px; border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 64, 128, 0.1);
+    }
+    .section-title {
+        color: #004080; font-weight: 700; font-size: 20px;
+        border-bottom: 2px solid #e6f0ff; padding-bottom: 10px; margin-bottom: 20px;
+    }
+    .search-form {
+        display: grid; grid-template-columns: 1fr 150px;
+        gap: 15px; margin-bottom: 20px;
+    }
+    input[type="text"] {
+        width: 100%; padding: 10px; border: 1px solid #dbe5f1;
+        border-radius: 6px; box-sizing: border-box; font-size: 14px;
+    }
+    button {
+        background-color: #004080; color: white; border: none;
+        padding: 10px 15px; border-radius: 8px; cursor: pointer;
+        font-size: 14px; font-weight: 600;
+    }
+    button:hover { background-color: #0059b3; }
+    
+    .results-area {
+        background-color: #f9fbfd;
+        border: 1px solid #e0e7ee;
+        border-radius: 8px;
+        padding: 20px;
+        display: none; 
+    }
+    .results-area pre {
+        background-color: #eee; padding: 15px;
+        border-radius: 5px; white-space: pre-wrap; 
+    }
+    .send-btn {
+        background-color: #198754; font-size: 16px;
+        padding: 12px 20px; margin-top: 15px;
+    }
+    .send-btn:hover { background-color: #157347; }
+    .send-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+
+    #feedback-message {
+        text-align: center; padding: 10px;
+        border-radius: 8px; font-weight: 600; display: none;
+    }
+    #feedback-message.success { background-color: #d4edda; color: #155724; }
+    #feedback-message.error { background-color: #f8d7da; color: #721c24; }
+</style>
+</head>
+<body>
+
+    <a href="index.html" class="back-link">← Volver al Panel Principal</a>
+    <h1>Envío Manual de Correos</h1>
+    <div id="feedback-message" style="margin-bottom: 20px;"></div>
+
+    <div class="container">
+        <h2 class="section-title">1. Enviar Correo de Recepción</h2>
+        <div class="search-form">
+            <input type="text" id="search-recepcion" placeholder="Escribe el N° de Control QC (ej. 0001)...">
+            <button onclick="buscar('recepcion')">Buscar</button>
+        </div>
+        <div id="results-recepcion" class="results-area">
+            <h4>Datos Encontrados:</h4>
+            <pre id="data-recepcion"></pre>
+            <button id="btn-recepcion" class="send-btn" onclick="enviarCorreo('recepcion')">
+                📧 Enviar Correo Recepción
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 class="section-title">2. Enviar Correo de Devolución / Consumo</h2>
+        <div class="search-form">
+            <input type="text" id="search-movimiento" placeholder="Escribe el ID del movimiento...">
+            <button onclick="buscar('movimiento')">Buscar</button>
+        </div>
+        <div id="results-movimiento" class="results-area">
+            <h4>Datos Encontrados:</h4>
+            <pre id="data-movimiento"></pre>
+            <button id="btn-movimiento" class="send-btn" onclick="enviarCorreo('movimiento')">
+                📧 Enviar Correo Movimiento
+            </button>
+        </div>
+    </div>
+
+<script>
+    const API_URL = 'http://localhost:3000/api';
+    // const token = ... <-- YA NO EXISTE
+    let currentRecepcionId = null;
+    let currentMovimientoId = null;
+    const feedbackMessage = document.getElementById('feedback-message');
+
+    document.getElementById('results-recepcion').style.display = 'none';
+    document.getElementById('results-movimiento').style.display = 'none';
+
+    async function buscar(tipo) {
+        // --- SE ELIMINÓ LA COMPROBACIÓN DEL TOKEN ---
+        
+        let id, url, dataArea, resultArea, btn;
+
+        if (tipo === 'recepcion') {
+            id = document.getElementById('search-recepcion').value;
+            url = `${API_URL}/recepciones/${id}`;
+            dataArea = document.getElementById('data-recepcion');
+            resultArea = document.getElementById('results-recepcion');
+            btn = document.getElementById('btn-recepcion');
+            currentRecepcionId = null;
+        } else {
+            id = document.getElementById('search-movimiento').value;
+            url = `${API_URL}/movimientos/${id}`;
+            dataArea = document.getElementById('data-movimiento');
+            resultArea = document.getElementById('results-movimiento');
+            btn = document.getElementById('btn-movimiento');
+            currentMovimientoId = null;
+        }
+
+        if (!id) {
+            alert('Por favor, escribe un ID para buscar.');
+            return;
+        }
+
+        try {
+            const response = await fetch(url); // <-- SIN HEADER DE AUTORIZACIÓN
+            if (response.status === 404) throw new Error('Registro no encontrado.');
+            if (!response.ok) throw new Error('Error al buscar el registro.');
+            
+            const data = await response.json();
+            
+            dataArea.textContent = JSON.stringify(data, null, 2);
+            resultArea.style.display = 'block';
+            btn.disabled = false;
+
+            if (tipo === 'recepcion') {
+                currentRecepcionId = data.id_recepcion;
+            } else {
+                currentMovimientoId = data.id_movimiento;
+            }
+            
+        } catch (error) {
+            alert(error.message);
+            resultArea.style.display = 'none';
+        }
+    }
+
+    async function enviarCorreo(tipo) {
+        // --- SE ELIMINÓ LA COMPROBACIÓN DEL TOKEN ---
+        
+        const email = prompt("Ingrese el correo del destinatario:");
+        if (!email) {
+            alert("Envío cancelado.");
+            return;
+        }
+
+        let id, url, btn;
+        
+        if (tipo === 'recepcion') {
+            id = currentRecepcionId;
+            url = `${API_URL}/correos/recepcion/${id}`;
+            btn = document.getElementById('btn-recepcion');
+        } else {
+            id = currentMovimientoId;
+            url = `${API_URL}/correos/movimiento/${id}`;
+            btn = document.getElementById('btn-movimiento');
+        }
+
+        if (!id) {
+            alert('Error: No hay un registro seleccionado.');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Enviando...';
+        feedbackMessage.style.display = 'none';
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                    // <-- SIN HEADER DE AUTORIZACIÓN
+                },
+                body: JSON.stringify({ email: email })
+            });
+            
+            if (!response.ok) throw new Error('Error en el servidor al enviar el correo.');
+            
+            feedbackMessage.textContent = '¡Correo enviado exitosamente!';
+            feedbackMessage.className = 'success';
+            feedbackMessage.style.display = 'block';
+            btn.textContent = '¡Enviado!';
+            btn.style.backgroundColor = 'green';
+            
+        } catch (error) {
+            feedbackMessage.textContent = error.message;
+            feedbackMessage.className = 'error';
+            feedbackMessage.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = `📧 Enviar Correo ${tipo}`;
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,15 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <script>
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            // Si no hay token, no puede estar aquí
-            alert('Acceso denegado. Debe iniciar sesión como administrador.');
-            window.location.href = 'login.html';
-        }
-    </script>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Módulo de Maestros</title>
 <style>
@@ -52,9 +44,15 @@
         font-size: 16px; font-weight: 600;
     }
     button:hover { background-color: #0059b3; }
-    #feedback-message { margin-top: 20px; display: none; }
-    #feedback-message.success { color: #155724; }
-    #feedback-message.error { color: #721c24; }
+    #feedback-message { 
+        margin-top: 20px; 
+        padding: 10px;
+        border-radius: 5px;
+        font-weight: 600;
+        display: none; 
+    }
+    #feedback-message.success { background-color: #d4edda; color: #155724; }
+    #feedback-message.error { background-color: #f8d7da; color: #721c24; }
 </style>
 </head>
 <body>
@@ -88,54 +86,49 @@
 
 <script>
     document.getElementById('uploadForm').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        
-        const form = event.target;
-        const formData = new FormData(form);
-        const feedback = document.getElementById('feedback-message');
-        
-        // Obtenemos el token guardado en el login
-        const token = localStorage.getItem('authToken');
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const feedback = document.getElementById('feedback-message');
 
-        // Si por alguna razón el token desapareció, detenemos
-        if (!token) {
-            window.location.href = 'login.html';
-            return;
-        }
+    feedback.style.display = 'block';
+    feedback.className = '';
+    feedback.textContent = 'Subiendo y procesando archivo... Espere por favor.';
 
-        feedback.style.display = 'block';
-        feedback.className = '';
-        feedback.textContent = 'Subiendo y procesando archivo...';
-
-        try {
-            // (AÚN NO HEMOS CREADO ESTE ENDPOINT EN EL BACKEND)
-            const response = await fetch('http://localhost:3000/api/maestros/upload', {
-                method: 'POST',
-                // ======================================================
-                // AUTENTICACIÓN: Enviamos el token en los encabezados
-                // ======================================================
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                // ======================================================
-                body: formData // Enviamos el archivo
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.message || 'Error al subir el archivo.');
-            }
-
-            feedback.textContent = result.message;
-            feedback.classList.add('success');
-            form.reset();
-
-        } catch (error) {
-            feedback.textContent = `Error: ${error.message}`;
-            feedback.classList.add('error');
-        }
+    try {
+    // --- CAMBIO AQUÍ ---
+    // Añade la URL completa del backend
+    const response = await fetch('http://localhost:3000/api/maestros/upload', {
+        method: 'POST',
+        body: formData
     });
+
+        // 1. Primero obtenemos el texto crudo de la respuesta
+        const text = await response.text();
+        let result;
+
+        // 2. Intentamos parsearlo como JSON
+        try {
+            result = JSON.parse(text);
+        } catch (e) {
+            // Si falla el parseo, es porque el servidor devolvió HTML o vacío (error grave)
+            console.error("Respuesta no-JSON del servidor:", text);
+            throw new Error(`El servidor devolvió una respuesta inválida (posible error 500 o timeout). Revise la consola.`);
+        }
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Error desconocido al subir el archivo.');
+        }
+
+        feedback.textContent = result.message;
+        feedback.classList.add('success');
+        form.reset();
+
+    } catch (error) {
+        feedback.textContent = `Error: ${error.message}`;
+        feedback.classList.add('error');
+    }
+});
 </script>
 
 </body>

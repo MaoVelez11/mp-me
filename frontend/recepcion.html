@@ -5,162 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Recepción de MP - ME</title>
 <style>
-    body {
-        font-family: 'Segoe UI', sans-serif;
-        background-color: #f0f4f8;
-        color: #333;
-        margin: 0;
-        padding: 20px 40px;
-    }
-    .back-link {
-        display: inline-block; margin-bottom: 15px; color: #004080;
-        text-decoration: none; font-weight: 600; font-size: 16px;
-    }
-    .back-link:hover { text-decoration: underline; }
-    h1 {
-        text-align: center; background-color: #004080; color: white;
-        padding: 20px; margin: 0 0 30px 0; border-radius: 8px;
-        font-size: 24px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    form {
-        max-width: 1300px; margin: 0 auto; background: white;
-        padding: 40px; border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 64, 128, 0.1);
-    }
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px 30px;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8; color: #333; margin: 0; padding: 20px 40px; }
+    .back-link { display: inline-block; margin-bottom: 15px; color: #004080; text-decoration: none; font-weight: 600; }
+    h1 { text-align: center; background-color: #004080; color: white; padding: 20px; border-radius: 8px; }
+    form { max-width: 1300px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px 30px; }
     .form-group { display: flex; flex-direction: column; }
-    label {
-        font-weight: 600; color: #004080; margin-bottom: 8px;
-    }
-    input, select, textarea {
-        width: 100%; padding: 10px; border: 1px solid #dbe5f1;
-        border-radius: 6px; box-sizing: border-box; font-size: 14px;
-        transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    input:focus, select:focus, textarea:focus {
-        outline: none; border-color: #0059b3;
-        box-shadow: 0 0 0 2px #e6f0ff;
-    }
-    input:read-only {
-        background-color: #e9ecef; color: #495057;
-        font-weight: bold; text-align: center;
-    }
-    textarea { resize: vertical; min-height: 50px; }
-    .section-title {
-        grid-column: 1 / -1; background-color: #e6f0ff;
-        color: #004080; font-weight: bold; text-align: center;
-        padding: 12px; border-radius: 6px; margin-top: 20px; font-size: 18px;
-    }
+    label { font-weight: 600; color: #004080; margin-bottom: 8px; }
+    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #dbe5f1; border-radius: 6px; }
+    input:read-only { background-color: #e9ecef; font-weight: bold; text-align: center; }
+    .section-title { grid-column: 1 / -1; background-color: #e6f0ff; color: #004080; font-weight: bold; text-align: center; padding: 12px; border-radius: 6px; margin-top: 20px; }
     .btn-container { grid-column: 1 / -1; text-align: center; }
-    button {
-        background-color: #004080; color: white; border: none;
-        padding: 14px 35px; border-radius: 8px; cursor: pointer;
-        font-size: 16px; font-weight: 600; margin-top: 20px;
-        transition: background-color 0.3s, transform 0.2s;
-    }
-    button:hover { background-color: #0059b3; transform: translateY(-2px); }
-    #feedback-message {
-        text-align: center; padding: 15px; margin-top: 20px;
-        border-radius: 8px; font-weight: 600; display: none;
-    }
-    #feedback-message.success { background-color: #d4edda; color: #155724; }
-    #feedback-message.error { background-color: #f8d7da; color: #721c24; }
-
-    /* --- INICIO: NUEVOS ESTILOS PARA BUSCADOR --- */
-    .search-container {
-        position: relative;
-        display: flex;
-        width: 100%;
-    }
-    .search-container input {
-        padding-right: 40px; /* Espacio para la lupa */
-    }
-    .search-icon {
-        position: absolute;
-        right: 1px;
-        top: 1px;
-        bottom: 1px;
-        width: 38px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        cursor: pointer;
-        background: #e9ecef;
-        border-radius: 0 6px 6px 0;
-        border-left: 1px solid #dbe5f1;
-    }
-    .search-icon:hover { background: #d1d9e0; }
-
-    /* Estilos del Modal */
-    .modal {
-        display: none; 
-        position: fixed; 
-        z-index: 1000; 
-        left: 0;
-        top: 0;
-        width: 100%; 
-        height: 100%; 
-        overflow: auto; 
-        background-color: rgba(0,0,0,0.5); 
-    }
-    .modal-content {
-        background-color: #fefefe;
-        margin: 10% auto; 
-        padding: 20px;
-        border: 1px solid #888;
-        border-radius: 8px;
-        width: 80%; 
-        max-width: 700px;
-    }
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid #ccc;
-        padding-bottom: 10px;
-    }
-    .modal-header h2 { margin: 0; color: #004080; }
-    .close-btn {
-        color: #aaa;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .close-btn:hover { color: #000; }
-    #modal-search-input {
-        width: 100%;
-        padding: 10px;
-        margin: 15px 0;
-        font-size: 16px;
-        box-sizing: border-box;
-    }
-    .modal-table-container {
-        max-height: 400px;
-        overflow-y: auto;
-    }
-    #modal-results-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    #modal-results-table th, #modal-results-table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-    }
-    #modal-results-table th {
-        background-color: #e6f0ff;
-        color: #004080;
-    }
-    #modal-results-table tr:hover {
-        background-color: #f0f4f8;
-        cursor: pointer;
-    }
-    /* --- FIN: NUEVOS ESTILOS --- */
-
+    button { background-color: #004080; color: white; border: none; padding: 14px 35px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; }
+    #feedback-message { text-align: center; padding: 15px; margin-top: 20px; border-radius: 8px; font-weight: 600; display: none; }
+    .success { background-color: #d4edda; color: #155724; }
+    .error { background-color: #f8d7da; color: #721c24; }
+    /* Estilos Buscador */
+    .search-container { position: relative; display: flex; width: 100%; }
+    .search-container input { padding-right: 40px; }
+    .search-icon { position: absolute; right: 1px; top: 1px; bottom: 1px; width: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #e9ecef; border-radius: 0 6px 6px 0; border-left: 1px solid #dbe5f1; }
+    /* Modal */
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+    .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 700px; }
+    .close-btn { float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+    #modal-results-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    #modal-results-table th, #modal-results-table td { border: 1px solid #ddd; padding: 8px; }
+    #modal-results-table th { background-color: #e6f0ff; }
+    #modal-results-table tr:hover { background-color: #f0f4f8; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -170,123 +41,56 @@
 
 <form id="recepcionForm">
     <div class="form-grid">
-
         <div class="form-group">
-            <label for="n_control_qc">N° Control QC</label>
-            <input type="text" id="n_control_qc" name="n_control_qc" readonly>
+            <label>N° Control QC (Automático)</label>
+            <input type="text" id="n_control_qc" name="n_control_qc" readonly placeholder="Cargando...">
         </div>
-        
         <div class="form-group">
-            <label for="cod_mp_me">Código MP / ME</label>
+            <label>Código MP / ME</label>
             <div class="search-container">
-                <input type="text" id="cod_mp_me" name="cod_mp_me" placeholder="Buscar por código..." required>
-                <span class="search-icon" onclick="abrirModalBusqueda()">🔍</span>
+                <input type="text" id="cod_mp_me" name="cod_mp_me" required>
+                <span class="search-icon" onclick="abrirModal()">🔍</span>
             </div>
         </div>
         <div class="form-group">
-            <label for="nombre_mp_me">Nombre de la MP / ME</label>
-            <input type="text" id="nombre_mp_me" name="nombre_mp_me" placeholder="Buscar por nombre..." required>
+            <label>Nombre de la MP / ME</label>
+            <div class="search-container">
+                <input type="text" id="nombre_mp_me" name="nombre_mp_me" required>
+                <span class="search-icon" onclick="abrirModal()">🔍</span>
+            </div>
         </div>
-        
+        <div class="form-group"><label>Presentación</label><input type="text" name="presentacion"></div>
+        <div class="form-group"><label>Cant/Peso</label><input type="text" name="cantidad_peso" required></div>
+        <div class="form-group"><label>Fecha Recepción</label><input type="date" id="fecha_recepcion" name="fecha_recepcion" readonly></div>
         <div class="form-group">
-            <label for="presentacion">Presentación</label>
-            <input type="text" id="presentacion" name="presentacion">
+            <label>Resp. Aprob. QC</label>
+            <select id="responsable_qc" name="responsable_qc" required><option value="">Cargando...</option></select>
         </div>
+        <div class="form-group"><label>Lote #</label><input type="text" name="lote" required></div>
+        <div class="form-group"><label>F. Vencimiento</label><input type="date" id="fecha_vencimiento" name="fecha_vencimiento"></div>
+        <div class="form-group"><label>N° Orden Compra</label><input type="text" name="n_orden_compra"></div>
+        <div class="form-group"><label>Fecha O.C</label><input type="date" name="fecha_oc"></div>
         <div class="form-group">
-            <label for="cantidad_peso">Cant/Peso</label>
-            <input type="text" id="cantidad_peso" name="cantidad_peso" required>
-        </div>
-        <div class="form-group">
-            <label for="fecha_recepcion">Fecha Recepción</label>
-            <input type="date" id="fecha_recepcion" name="fecha_recepcion" readonly>
-        </div>
-        <div class="form-group">
-            <label for="responsable_qc">Resp. Aprob. QC</label>
-            <select id="responsable_qc" name="responsable_qc" required>
-                <option value="">Seleccione</option>
-                <option value="Persona 1">Persona 1</option>
-                <option value="Persona 2">Persona 2</option>
-                <option value="Persona 3">Persona 3</option>
+            <label>Tipo Insumo</label>
+            <select name="tipo_insumo" required>
+                <option value="">Seleccione</option><option>Materia Prima</option><option>Material Empaque</option><option>Otro</option>
             </select>
         </div>
-        <div class="form-group">
-            <label for="lote">Lote #</label>
-            <input type="text" id="lote" name="lote" required>
-        </div>
-        <div class="form-group">
-            <label for="fecha_vencimiento">F. Vencimiento</label>
-            <input type="date" id="fecha_vencimiento" name="fecha_vencimiento">
-        </div>
-        <div class="form-group">
-            <label for="n_orden_compra">N° Orden Compra</label>
-            <input type="text" id="n_orden_compra" name="n_orden_compra">
-        </div>
-        <div class="form-group">
-            <label for="fecha_oc">Fecha O.C</label>
-            <input type="date" id="fecha_oc" name="fecha_oc">
-        </div>
-        <div class="form-group">
-            <label for="tipo_insumo">Tipo Insumo</label>
-            <select id="tipo_insumo" name="tipo_insumo" required>
-                <option value="">Seleccione</option>
-                <option>Materia Prima</option>
-                <option>Material Empaque</option>
-                <option>Otro</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="total_unidades_peso">Total Unidades / Peso</label>
-            <input type="number" step="0.01" id="total_unidades_peso" name="total_unidades_peso" required>
-        </div>
-        <div class="form-group">
-            <label for="total_etiquetas">Total de Etiquetas</label>
-            <input type="number" id="total_etiquetas" name="total_etiquetas" required>
-        </div>
-        <div class="form-group">
-            <label for="placa_vehiculo">Placa Vehículo</label>
-            <input type="text" id="placa_vehiculo" name="placa_vehiculo">
-        </div>
-        <div class="form-group">
-            <label for="proveedor">Proveedor</label>
-            <input type="text" id="proveedor" name="proveedor">
-        </div>
+        <div class="form-group"><label>Total Unidades / Peso</label><input type="number" step="0.01" name="total_unidades_peso" required></div>
+        <div class="form-group"><label>Total Etiquetas</label><input type="number" name="total_etiquetas" required></div>
+        <div class="form-group"><label>Placa Vehículo</label><input type="text" name="placa_vehiculo"></div>
+        <div class="form-group"><label>Proveedor</label><input type="text" name="proveedor"></div>
 
         <div class="section-title">Calificación de Proveedor</div>
-        <div class="form-group">
-            <label>Calidad Producto</label>
-            <select name="calidad_producto" class="quality-check" required>
-                <option value="1">Sí</option><option value="0">No</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Oportunidad Entrega</label>
-            <select name="oportunidad_entrega" class="quality-check" required>
-                <option value="1">Sí</option><option value="0">No</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Cumplimiento Parámetros</label>
-            <select name="cumplimiento_parametros" class="quality-check" required>
-                <option value="1">Sí</option><option value="0">No</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Servicio</label>
-            <select name="servicio" class="quality-check" required>
-                <option value="1">Sí</option><option value="0">No</option>
-            </select>
-        </div>
-        <div class="form-group" style="grid-column: span 2;">
-            <label for="razon_nc">Razón de la No Conformidad</label>
-            <textarea id="razon_nc" name="razon_nc" rows="2" disabled></textarea>
-        </div>
-        <div class="form-group" style="grid-column: span 2;">
-            <label for="tratamiento_nc">Tratamiento de la No Conformidad</label>
-            <textarea id="tratamiento_nc" name="tratamiento_nc" rows="2" disabled></textarea>
-        </div>
-        
+        <div class="form-group"><label>Calidad Producto</label><select name="calidad_producto" class="qc-check" required><option value="1">Sí</option><option value="0">No</option></select></div>
+        <div class="form-group"><label>Oportunidad Entrega</label><select name="oportunidad_entrega" class="qc-check" required><option value="1">Sí</option><option value="0">No</option></select></div>
+        <div class="form-group"><label>Cumplimiento Parámetros</label><select name="cumplimiento_parametros" class="qc-check" required><option value="1">Sí</option><option value="0">No</option></select></div>
+        <div class="form-group"><label>Servicio</label><select name="servicio" class="qc-check" required><option value="1">Sí</option><option value="0">No</option></select></div>
+        <div class="form-group" style="grid-column: span 2;"><label>Razón NC</label><textarea id="razon_nc" name="razon_nc" rows="2" disabled></textarea></div>
+        <div class="form-group" style="grid-column: span 2;"><label>Tratamiento NC</label><textarea id="tratamiento_nc" name="tratamiento_nc" rows="2" disabled></textarea></div>
+
         <div class="btn-container">
-            <button type="submit">Guardar Registro</button>
+            <button type="submit">Guardar Recepción</button>
             <div id="feedback-message"></div>
         </div>
     </div>
@@ -294,211 +98,126 @@
 
 <div id="searchModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <h2>Buscar Producto</h2>
-            <span class="close-btn" onclick="cerrarModalBusqueda()">×</span>
-        </div>
-        
-        <input type="text" id="modal-search-input" onkeyup="filtrarProductos()" placeholder="Escriba un código o nombre para buscar...">
-        
-        <div class="modal-table-container">
-            <table id="modal-results-table">
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Nombre Producto</th>
-                        <th>Saldo</th>
-                        <th>Ubicación</th>
-                    </tr>
-                </thead>
-                <tbody id="modal-results-body">
-                    </tbody>
-            </table>
+        <span class="close-btn" onclick="cerrarModal()">&times;</span>
+        <h2>Buscar Producto</h2>
+        <input type="text" id="modal-search" onkeyup="filtrarProductos()" placeholder="Buscar..." style="width:100%; padding:10px; margin-bottom:15px;">
+        <div style="max-height:300px; overflow-y:auto;">
+            <table id="modal-results-table"><thead><tr><th>Código</th><th>Nombre</th></tr></thead><tbody id="modal-results-body"></tbody></table>
         </div>
     </div>
 </div>
+
 <script>
-    // --- INICIO: NUEVAS VARIABLES GLOBALES ---
-    let allProducts = []; // Almacenará todos los productos del inventario
-    const searchModal = document.getElementById('searchModal');
-    const modalSearchInput = document.getElementById('modal-search-input');
-    const modalResultsBody = document.getElementById('modal-results-body');
-    const codMpInput = document.getElementById('cod_mp_me');
-    const nombreMpInput = document.getElementById('nombre_mp_me');
-    // --- FIN: NUEVAS VARIABLES GLOBALES ---
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // ... (Referencias a elementos del DOM existentes) ...
-        const form = document.getElementById('recepcionForm');
-        const fechaRecepcionInput = document.getElementById('fecha_recepcion');
-        const fechaVencimientoInput = document.getElementById('fecha_vencimiento');
-        const qualityChecks = document.querySelectorAll('.quality-check');
-        const razonNcTextarea = document.getElementById('razon_nc');
-        const tratamientoNcTextarea = document.getElementById('tratamiento_nc');
-        const feedbackMessage = document.getElementById('feedback-message');
-        const qcInput = document.getElementById('n_control_qc');
-
-        // --- INICIO: NUEVA LÓGICA DE CARGA ---
-        // 1. Cargar el N° de QC al iniciar
+    const API_URL = 'http://localhost:3000/api';
+    let allProducts = [];
+    
+    document.addEventListener('DOMContentLoaded', () => {
         loadNextQC();
-        // 2. Cargar la lista de productos del inventario
-        loadAllProducts();
-        // --- FIN: NUEVA LÓGICA DE CARGA ---
-
-        // Función para cargar el próximo N° de Control QC
-        async function loadNextQC() {
-            try {
-                const response = await fetch('http://localhost:3000/api/recepciones/next-qc');
-                if (!response.ok) throw new Error('No se pudo cargar el consecutivo.');
-                
-                const data = await response.json();
-                qcInput.value = data.nextQC; 
-            } catch (error) {
-                qcInput.value = "Error";
-                console.error(error);
-            }
-        }
-
-        // --- INICIO: NUEVA FUNCIÓN ---
-        // Carga todos los productos de /api/inventario y los guarda
-        async function loadAllProducts() {
-            try {
-                const response = await fetch('http://localhost:3000/api/inventario');
-                if (!response.ok) throw new Error('No se pudo cargar el maestro de productos.');
-                
-                allProducts = await response.json();
-                renderProductList(allProducts); // Opcional: llenar la tabla del modal al inicio
-            } catch (error) {
-                console.error(error);
-                modalResultsBody.innerHTML = `<tr><td colspan="4" style="color:red;">${error.message}</td></tr>`;
-            }
-        }
-        // --- FIN: NUEVA FUNCIÓN ---
-
-        // ... (Lógica de fechas y calificación de proveedor sin cambios) ...
-        // 2. Establecer fecha de recepción a hoy
-        const hoy = new Date().toISOString().split('T')[0];
-        fechaRecepcionInput.value = hoy;
-        // 3. Calcular fecha de vencimiento (+6 meses)
-        const fechaVenc = new Date();
-        fechaVenc.setMonth(fechaVenc.getMonth() + 6);
-        fechaVencimientoInput.value = fechaVenc.toISOString().split('T')[0];
-        // Lógica de calificación
-        function toggleNcFields() {
-            let algunaRespuestaNo = false;
-            qualityChecks.forEach(select => {
-                if (select.value === '0') {
-                    algunaRespuestaNo = true;
-                }
-            });
-            razonNcTextarea.disabled = !algunaRespuestaNo;
-            tratamientoNcTextarea.disabled = !algunaRespuestaNo;
-        }
-        qualityChecks.forEach(select => select.addEventListener('change', toggleNcFields));
-        
-        // --- ENVÍO DEL FORMULARIO A LA API (sin cambios) ---
-        form.addEventListener('submit', async function(event) {
-            event.preventDefault(); 
-            const formData = new FormData(form);
-            const data = {};
-            formData.forEach((value, key) => {
-                if (['calidad_producto', 'oportunidad_entrega', 'cumplimiento_parametros', 'servicio'].includes(key)) {
-                    data[key] = value === '1';
-                } else {
-                    data[key] = value;
-                }
-            });
-            
-            feedbackMessage.style.display = 'block';
-            feedbackMessage.className = '';
-            feedbackMessage.textContent = 'Guardando...';
-
-            try {
-                const response = await fetch('http://localhost:3000/api/recepciones', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                if (response.ok) {
-                    feedbackMessage.textContent = `¡Registro guardado! Consecutivo: ${result.n_control_qc}`;
-                    feedbackMessage.classList.add('success');
-                    form.reset(); 
-                    
-                    fechaRecepcionInput.value = hoy;
-                    fechaVencimientoInput.value = fechaVenc.toISOString().split('T')[0];
-                    loadNextQC(); 
-                    toggleNcFields(); 
-                } else {
-                    throw new Error(result.message || 'Error al guardar el registro.');
-                }
-            } catch (error) {
-                feedbackMessage.textContent = `Error: ${error.message}`;
-                feedbackMessage.classList.add('error');
-            }
-        });
+        loadResponsables();
+        loadProducts();
+        setupDates();
     });
 
-    // --- INICIO: NUEVAS FUNCIONES PARA EL MODAL ---
-
-    // Abre el modal y muestra la lista completa
-    function abrirModalBusqueda() {
-        searchModal.style.display = "block";
-        modalSearchInput.value = ""; // Limpiar búsqueda anterior
-        renderProductList(allProducts); // Mostrar todos los productos
-        modalSearchInput.focus();
+    async function loadNextQC() {
+        try {
+            const res = await fetch(`${API_URL}/recepciones/next-qc`);
+            const data = await res.json();
+            document.getElementById('n_control_qc').value = data.nextQC || 'Error';
+        } catch (e) { console.error(e); }
     }
 
-    // Cierra el modal
-    function cerrarModalBusqueda() {
-        searchModal.style.display = "none";
+    async function loadResponsables() {
+        try {
+            const res = await fetch(`${API_URL}/responsables`);
+            const data = await res.json();
+            const select = document.getElementById('responsable_qc');
+            select.innerHTML = '<option value="">Seleccione</option>';
+            data.forEach(r => select.innerHTML += `<option>${r.nombre}</option>`);
+        } catch (e) { console.error(e); }
     }
 
-    // Dibuja la lista de productos en la tabla del modal
-    function renderProductList(products) {
-        modalResultsBody.innerHTML = ''; // Limpiar tabla
-        if (products.length === 0) {
-            modalResultsBody.innerHTML = '<tr><td colspan="4">No se encontraron productos.</td></tr>';
-            return;
-        }
-        products.forEach(product => {
-            modalResultsBody.innerHTML += `
-                <tr onclick="seleccionarProducto('${product.codigo_referencia}', '${product.nombre_producto}')">
-                    <td>${product.codigo_referencia}</td>
-                    <td>${product.nombre_producto}</td>
-                    <td>${product.saldo}</td>
-                    <td>${product.ubicacion}</td>
-                </tr>
-            `;
+    async function loadProducts() {
+        try {
+            const res = await fetch(`${API_URL}/inventario`);
+            allProducts = await res.json();
+        } catch (e) { console.error(e); }
+    }
+
+    function setupDates() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('fecha_recepcion').value = today;
+        const future = new Date(); future.setMonth(future.getMonth() + 6);
+        document.getElementById('fecha_vencimiento').value = future.toISOString().split('T')[0];
+    }
+
+    // Modal functions
+    const modal = document.getElementById('searchModal');
+    function abrirModal() { 
+        modal.style.display = 'block'; 
+        renderProducts(allProducts);
+        document.getElementById('modal-search').focus();
+    }
+    function cerrarModal() { modal.style.display = 'none'; }
+    function renderProducts(list) {
+        const tbody = document.getElementById('modal-results-body');
+        tbody.innerHTML = '';
+        list.forEach(p => {
+            tbody.innerHTML += `<tr onclick="selectProduct('${p.codigo_referencia}', '${p.nombre_producto}')"><td>${p.codigo_referencia}</td><td>${p.nombre_producto}</td></tr>`;
         });
     }
-
-    // Filtra la lista de productos mientras el usuario escribe
     function filtrarProductos() {
-        const searchTerm = modalSearchInput.value.toLowerCase();
-        const filteredProducts = allProducts.filter(product => {
-            const codigo = String(product.codigo_referencia).toLowerCase();
-            const nombre = product.nombre_producto.toLowerCase();
-            return codigo.includes(searchTerm) || nombre.includes(searchTerm);
+        const term = document.getElementById('modal-search').value.toLowerCase();
+        renderProducts(allProducts.filter(p => p.codigo_referencia.toLowerCase().includes(term) || p.nombre_producto.toLowerCase().includes(term)));
+    }
+    function selectProduct(cod, nom) {
+        document.getElementById('cod_mp_me').value = cod;
+        document.getElementById('nombre_mp_me').value = nom;
+        cerrarModal();
+    }
+    window.onclick = (e) => { if (e.target == modal) cerrarModal(); }
+
+    // Form submission
+    document.getElementById('recepcionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = {};
+        formData.forEach((value, key) => data[key] = value);
+        
+        // Convertir checkboxes de QC a booleanos
+        ['calidad_producto', 'oportunidad_entrega', 'cumplimiento_parametros', 'servicio'].forEach(k => {
+            data[k] = data[k] === '1';
         });
-        renderProductList(filteredProducts);
-    }
 
-    // Pone los datos en el formulario y cierra el modal
-    function seleccionarProducto(codigo, nombre) {
-        codMpInput.value = codigo;
-        nombreMpInput.value = nombre;
-        cerrarModalBusqueda();
-    }
+        const feedback = document.getElementById('feedback-message');
+        feedback.style.display = 'block'; feedback.className = ''; feedback.textContent = 'Guardando...';
 
-    // Cierra el modal si se hace clic fuera de él (opcional)
-    window.onclick = function(event) {
-        if (event.target == searchModal) {
-            cerrarModalBusqueda();
+        try {
+            const res = await fetch(`${API_URL}/recepciones`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.message);
+            
+            feedback.textContent = `¡Guardado! Consecutivo: ${result.n_control_qc}`;
+            feedback.className = 'success';
+            e.target.reset();
+            setupDates(); loadNextQC();
+        } catch (err) {
+            feedback.textContent = `Error: ${err.message}`;
+            feedback.className = 'error';
         }
-    }
-    // --- FIN: NUEVAS FUNCIONES PARA EL MODAL ---
-</script>
+    });
 
+    // QC toggle
+    document.querySelectorAll('.qc-check').forEach(select => {
+        select.addEventListener('change', () => {
+            const anyNo = Array.from(document.querySelectorAll('.qc-check')).some(s => s.value === '0');
+            document.getElementById('razon_nc').disabled = !anyNo;
+            document.getElementById('tratamiento_nc').disabled = !anyNo;
+        });
+    });
+</script>
 </body>
 </html>

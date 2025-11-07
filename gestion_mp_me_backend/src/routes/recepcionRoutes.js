@@ -2,12 +2,16 @@ const express = require('express');
 const router = express.Router();
 const recepcionController = require('../controllers/recepcionController');
 
-// ... (rutas POST y GET existentes)
+// --- Rutas Públicas ---
+
+// 1. Rutas específicas PRIMERO
+router.get('/next-qc', recepcionController.getNextQC);
+
+// 2. Rutas generales después
 router.post('/', recepcionController.crearRecepcion);
 router.get('/', recepcionController.obtenerRecepciones);
 
-// --- AÑADE ESTA LÍNEA AL FINAL ---
-// GET /api/recepciones/next-qc
-router.get('/next-qc', recepcionController.getNextQC);
+// 3. Rutas con parámetros (ID) AL FINAL
+router.get('/:id', recepcionController.getRecepcionById);
 
 module.exports = router;

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ingresar Nuevo Movimiento</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f0f4f8; margin: 0; padding: 20px 40px;
+    }
+    .back-link {
+        display: inline-block; margin-bottom: 15px; color: #004080;
+        text-decoration: none; font-weight: 600; font-size: 16px;
+    }
+    h1 {
+        text-align: center; background-color: #004080; color: white;
+        padding: 20px; margin: 0 0 30px 0; border-radius: 8px;
+    }
+    .container {
+        max-width: 1400px; margin: 0 auto; background: white;
+        padding: 30px 40px; border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 64, 128, 0.1);
+        margin-bottom: 20px;
+    }
+    .toolbar {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 25px; border-bottom: 2px solid #e6f0ff; padding-bottom: 20px;
+    }
+    .toolbar h2 { color: #004080; margin: 0; }
+    .btn-cerrar-dia {
+        background-color: #ffc107; color: #333; border: none;
+        padding: 12px 20px; border-radius: 6px; cursor: pointer;
+        font-size: 16px; font-weight: 600;
+    }
+    .btn-cerrar-dia:hover { background-color: #e0a800; }
+    
+    /* Formulario de Ingreso */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 100px; /* 5 columnas */
+        gap: 15px;
+        align-items: flex-end;
+    }
+    .form-group label {
+        font-weight: 600; color: #004080; margin-bottom: 8px; display: block;
+    }
+    .form-group input {
+        width: 100%; padding: 10px; border: 1px solid #dbe5f1;
+        border-radius: 6px; box-sizing: border-box; font-size: 14px;
+    }
+    .btn-agregar {
+        background-color: #004080; color: white; border: none;
+        padding: 10px 15px; border-radius: 6px; cursor: pointer;
+        font-size: 14px; font-weight: 600; height: 38px;
+    }
+    .btn-agregar:hover { background-color: #0059b3; }
+    
+    /* Tabla de Movimientos */
+    table {
+        width: 100%; border-collapse: collapse; margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #dbe5f1; padding: 12px; text-align: left;
+    }
+    th { background-color: #e6f0ff; color: #004080; }
+    tbody tr:nth-child(even) { background-color: #f9fbfd; }
+    
+    #feedback-message { display: none; margin-top: 20px; padding: 10px; border-radius: 5px; }
+    #feedback-message.success { background-color: #d4edda; color: #155724; }
+    #feedback-message.error { background-color: #f8d7da; color: #721c24; }
+</style>
+</head>
+<body>
+
+    <a href="index.html" class="back-link">← Volver al Panel Principal</a>
+    <h1>Ingresar Nuevo Movimiento</h1>
+
+    <div class="container">
+        <form id="addMovementForm" class="form-grid">
+            <div class="form-group">
+                <label for="referencia">Referencia</label>
+                <input type="text" id="referencia" placeholder="10001" required>
+            </div>
+            <div class="form-group">
+                <label for="producto">Producto</label>
+                <input type="text" id="producto" placeholder="AGUA" required>
+            </div>
+            <div class="form-group">
+                <label for="lote">Lote</label>
+                <input type="text" id="lote" placeholder="1222/...">
+            </div>
+            <div class="form-group">
+                <label for="cantidad">Cantidad</label>
+                <input type="number" id="cantidad" step="0.01" required>
+            </div>
+            <button type="submit" class="btn-agregar">Agregar</button>
+        </form>
+        <div id="feedback-message"></div>
+    </div>
+
+    <div class="container">
+        <div class="toolbar">
+            <h2>Movimientos del Día (Abiertos)</h2>
+            <button class="btn-cerrar-dia" onclick="cerrarDia()">
+                Cerrar Día y Generar Etiquetas
+            </button>
+        </div>
+        
+        <table id="tabla-movimientos">
+            <thead>
+                <tr>
+                    <th>Referencia</th>
+                    <th>Producto</th>
+                    <th>Lote</th>
+                    <th>Cantidad</th>
+                    <th>Bitácora (Total Ref.)</th>
+                    <th>Fecha Creación</th>
+                </tr>
+            </thead>
+            <tbody id="movimientos-body">
+                </tbody>
+        </table>
+    </div>
+
+<script>
+    // Apuntamos a la NUEVA API
+    const API_URL = 'http://localhost:3000/api/ingreso-movimiento'; 
+    const token = localStorage.getItem('authToken');
+    const feedbackMessage = document.getElementById('feedback-message');
+
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarMovimientos();
+    });
+
+    // 1. Cargar la tabla de movimientos 'abiertos'
+    async function cargarMovimientos() {
+        const tbody = document.getElementById('movimientos-body');
+        tbody.innerHTML = '<tr><td colspan="6">Cargando movimientos...</td></tr>';
+        
+        try {
+            // Apunta a la nueva ruta GET
+            const response = await fetch(`${API_URL}`);
+            if (!response.ok) throw new Error('Error al cargar la bitácora.');
+            
+            const data = await response.json();
+            renderMovimientos(data);
+        } catch (error) {
+            tbody.innerHTML = `<tr><td colspan="6" style="color:red;">${error.message}</td></tr>`;
+        }
+    }
+    
+    // 2. Dibujar la tabla
+    function renderMovimientos(movements) {
+        const tbody = document.getElementById('movimientos-body');
+        tbody.innerHTML = '';
+        
+        if (movements.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6">No hay movimientos abiertos.</td></tr>';
+            return;
+        }
+        
+        movements.forEach(item => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${item.referencia}</td>
+                    <td>${item.producto}</td>
+                    <td>${item.lote || ''}</td>
+                    <td>${item.cantidad}</td>
+                    <td>${item.bitacora}</td>
+                    <td>${new Date(item.fecha_creacion).toLocaleString()}</td>
+                </tr>
+            `;
+        });
+    }
+
+    // 3. Agregar un nuevo movimiento
+    document.getElementById('addMovementForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        
+        const data = {
+            referencia: document.getElementById('referencia').value,
+            producto: document.getElementById('producto').value,
+            lote: document.getElementById('lote').value,
+            cantidad: document.getElementById('cantidad').value
+        };
+
+        feedbackMessage.style.display = 'block';
+        feedbackMessage.className = '';
+        feedbackMessage.textContent = 'Guardando...';
+
+        try {
+            // Apunta a la nueva ruta POST
+            const response = await fetch(`${API_URL}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.message || 'Error al guardar.');
+            }
+            
+            feedbackMessage.textContent = '¡Movimiento guardado exitosamente!';
+            feedbackMessage.className = 'success';
+            document.getElementById('addMovementForm').reset();
+            cargarMovimientos(); // Recargar la tabla
+
+        } catch (error) {
+            feedbackMessage.textContent = `Error: ${error.message}`;
+            feedbackMessage.className = 'error';
+        }
+    });
+
+    // 4. Cerrar el día
+    async function cerrarDia() {
+        if (!token) {
+            alert('Debe iniciar sesión como administrador para cerrar el día.');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        if (!confirm('¿Deseas cerrar el día y generar las etiquetas? Esta acción marcará todos los movimientos como cerrados.')) {
+            return;
+        }
+
+        try {
+            // Apunta a la nueva ruta /cerrar-dia
+            const response = await fetch(`${API_URL}/cerrar-dia`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (response.status === 401) throw new Error('Token inválido. Vuelva a iniciar sesión.');
+            if (!response.ok) throw new Error('Error en el servidor al cerrar el día.');
+            
+            alert('✅ El día se cerró correctamente. Las etiquetas están listas para impresión.');
+            cargarMovimientos(); // La tabla de movimientos abiertos quedará vacía
+
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+</script>
+
+</body>
+</html>

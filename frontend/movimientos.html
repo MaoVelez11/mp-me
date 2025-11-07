@@ -6,143 +6,100 @@
 <title>Bitácora de Movimientos - Consumos</title>
 <style>
     body {
-        font-family: 'Segoe UI', sans-serif;
-        background-color: #f0f4f8;
-        color: #333;
-        margin: 0;
-        padding: 20px 40px;
+        font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8;
+        color: #333; margin: 0; padding: 20px 40px;
     }
-
-    /* --- AÑADE ESTE CÓDIGO --- */
     .back-link {
-        display: inline-block;
-        margin-bottom: 15px;
-        color: #004080;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 16px;
+        display: inline-block; margin-bottom: 15px; color: #004080;
+        text-decoration: none; font-weight: 600; font-size: 16px;
     }
-    .back-link:hover {
-        text-decoration: underline;
-    }
-
     h1 {
-        text-align: center;
-        background-color: #004080;
-        color: white;
-        padding: 20px;
-        margin: 0 0 30px 0;
-        border-radius: 8px;
-        font-size: 24px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        text-align: center; background-color: #004080; color: white;
+        padding: 20px; margin: 0 0 30px 0; border-radius: 8px;
+        font-size: 24px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-
     form {
-        max-width: 900px;
-        margin: 0 auto;
-        background: white;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 64, 128, 0.1);
+        max-width: 1000px; /* Ancho aumentado para 4 columnas */
+        margin: 0 auto; background: white; padding: 40px;
+        border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 64, 128, 0.1);
     }
-
     .form-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(4, 1fr); /* 4 columnas */
         gap: 20px 30px;
     }
-    
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .full-width {
-        grid-column: 1 / -1;
-    }
-
+    .form-group { display: flex; flex-direction: column; }
+    .full-width { grid-column: 1 / -1; }
     label {
-        font-weight: 600;
-        color: #004080;
-        margin-bottom: 8px;
+        font-weight: 600; color: #004080; margin-bottom: 8px;
     }
-
     input, select, textarea {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #dbe5f1;
-        border-radius: 6px;
-        box-sizing: border-box;
-        font-size: 14px;
-        transition: border-color 0.3s, box-shadow 0.3s;
+        width: 100%; padding: 10px; border: 1px solid #dbe5f1;
+        border-radius: 6px; box-sizing: border-box; font-size: 14px;
     }
-
-    input:focus, select:focus, textarea:focus {
-        outline: none;
-        border-color: #0059b3;
-        box-shadow: 0 0 0 2px #e6f0ff;
+    .btn-container { grid-column: 1 / -1; text-align: center; }
+    button {
+        background-color: #004080; color: white; border: none;
+        padding: 14px 35px; border-radius: 8px; cursor: pointer;
+        font-size: 16px; font-weight: 600; margin-top: 20px;
     }
     
-    textarea {
-        resize: vertical;
-        min-height: 60px;
+    /* --- Estilos del Buscador y Modal (Limpiados) --- */
+    .search-container { position: relative; display: flex; width: 100%; }
+    .search-container input { padding-right: 40px; }
+    .search-icon {
+        position: absolute; right: 1px; top: 1px; bottom: 1px;
+        width: 38px; display: flex; align-items: center; justify-content: center;
+        font-size: 20px; cursor: pointer; background: #e9ecef;
+        border-radius: 0 6px 6px 0; border-left: 1px solid #dbe5f1;
     }
-
-    .btn-container {
-        grid-column: 1 / -1;
-        text-align: center;
+    .modal {
+        display: none; position: fixed; z-index: 1000; left: 0;
+        top: 0; width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.5);
     }
-
-    button {
-        background-color: #004080;
-        color: white;
-        border: none;
-        padding: 14px 35px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: 600;
-        margin-top: 20px;
-        transition: background-color 0.3s, transform 0.2s;
+    .modal-content {
+        background-color: #fefefe; margin: 10% auto; padding: 20px;
+        border-radius: 8px; width: 80%; max-width: 700px;
     }
-
-    button:hover {
-        background-color: #0059b3;
-        transform: translateY(-2px);
-    }
-
-    #feedback-message {
-        text-align: center;
-        padding: 15px;
-        margin-top: 20px;
-        border-radius: 8px;
-        font-weight: 600;
-        display: none;
-    }
-    #feedback-message.success {
-        background-color: #d4edda;
-        color: #155724;
-    }
-    #feedback-message.error {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h2 { color: #004080; }
+    .close-btn { font-size: 28px; font-weight: bold; cursor: pointer; }
+    #modal-search-input { width: 100%; padding: 10px; margin: 15px 0; }
+    .modal-table-container { max-height: 400px; overflow-y: auto; }
+    #modal-results-table { width: 100%; border-collapse: collapse; }
+    #modal-results-table th, #modal-results-table td { border: 1px solid #ddd; padding: 8px; }
+    #modal-results-table th { background-color: #e6f0ff; color: #004080; }
+    #modal-results-table tr:hover { background-color: #f0f4f8; cursor: pointer; }
+    #feedback-message { display: none; margin-top: 20px; }
+    #feedback-message.success { color: #155724; }
+    #feedback-message.error { color: #721c24; }
 </style>
 </head>
 <body>
+
 <a href="index.html" class="back-link">← Volver al Panel Principal</a>
 <h1>Bitácora de Movimientos - Consumos 601</h1>
 
 <form id="bitacoraForm">
     <div class="form-grid">
+        
         <div class="form-group">
             <label for="referencia">Referencia (Código MP/ME)</label>
-            <input type="text" id="referencia" name="referencia" placeholder="Ingrese el código del producto" required>
+            <div class="search-container">
+                <input type="text" id="referencia" name="referencia" placeholder="Buscar por código..." required>
+                <span class="search-icon" onclick="abrirModalBusqueda()">🔍</span>
+            </div>
         </div>
+        
         <div class="form-group">
             <label for="producto">Producto</label>
-            <input type="text" id="producto" name="producto" placeholder="Nombre del producto" required>
+            <div class="search-container">
+                <input type="text" id="producto" name="producto" placeholder="Buscar por nombre..." required>
+                <span class="search-icon" onclick="abrirModalBusqueda()">🔍</span>
+            </div>
         </div>
+
         <div class="form-group">
             <label for="lote">Lote</label>
             <input type="text" id="lote" name="lote" placeholder="Número de lote" required>
@@ -165,25 +122,68 @@
                 <option>Área de Producción</option>
             </select>
         </div>
+
+        <div class="form-group">
+            <label for="tipo_movimiento">Tipo de Movimiento</label>
+            <select id="tipo_movimiento" name="tipo_movimiento" required>
+                <option value="">Seleccione</option>
+                <option value="Consumo">Consumo</option>
+                <option value="Devolución">Devolución</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="cliente">Cliente</label>
+            <input type="text" id="cliente" name="cliente" placeholder="Nombre del cliente" required>
+        </div>
+        
         <div class="form-group full-width">
             <label for="observaciones">Observaciones</label>
             <textarea id="observaciones" name="observaciones" rows="3" placeholder="Detalles u observaciones adicionales"></textarea>
         </div>
         <div class="btn-container">
-            <button type="submit">Guardar Movimiento</button>
+           <button type="submit">Guardar Movimiento</button>
             <div id="feedback-message"></div>
         </div>
     </div>
 </form>
 
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Buscar Producto</h2>
+            <span class="close-btn" onclick="cerrarModalBusqueda()">×</span>
+        </div>
+        <input type="text" id="modal-search-input" onkeyup="filtrarProductos()" placeholder="Escriba un código o nombre para buscar...">
+        <div class="modal-table-container">
+            <table id="modal-results-table">
+                <thead>
+                    <tr><th>Código</th><th>Nombre Producto</th><th>Saldo</th><th>Ubicación</th></tr>
+                </thead>
+                <tbody id="modal-results-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
 <script>
+    // --- Variables Globales para el Buscador ---
+    let allProducts = [];
+    const searchModal = document.getElementById('searchModal');
+    const modalSearchInput = document.getElementById('modal-search-input');
+    const modalResultsBody = document.getElementById('modal-results-body');
+    const referenciaInput = document.getElementById('referencia');
+    const productoInput = document.getElementById('producto');
+
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('bitacoraForm');
         const feedbackMessage = document.getElementById('feedback-message');
+        
+        loadAllProducts();
 
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
-
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
 
@@ -194,29 +194,75 @@
             try {
                 const response = await fetch('http://localhost:3000/api/movimientos', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-
                 const result = await response.json();
-
                 if (response.ok) {
-                    feedbackMessage.textContent = `¡Movimiento guardado exitosamente! ID: ${result.id_insertado}`;
+                    feedbackMessage.textContent = `¡Movimiento Guardado! ID: ${result.id_insertado}.`;
                     feedbackMessage.classList.add('success');
                     form.reset();
                 } else {
-                    // El error de "saldo insuficiente" vendrá del backend
                     throw new Error(result.message || 'Error al guardar el movimiento.');
                 }
-
             } catch (error) {
                 feedbackMessage.textContent = `Error: ${error.message}`;
                 feedbackMessage.classList.add('error');
             }
         });
     });
+
+    // --- Funciones del Modal (sin cambios) ---
+    async function loadAllProducts() {
+        try {
+            const response = await fetch('http://localhost:3000/api/inventario');
+            if (!response.ok) throw new Error('No se pudo cargar el maestro de productos.');
+            allProducts = await response.json();
+        } catch (error) { console.error(error); alert(error.message); }
+    }
+    function abrirModalBusqueda() {
+        searchModal.style.display = "block";
+        modalSearchInput.value = "";
+        renderProductList(allProducts);
+        modalSearchInput.focus();
+    }
+    function cerrarModalBusqueda() { searchModal.style.display = "none"; }
+    function renderProductList(products) {
+        modalResultsBody.innerHTML = '';
+        if (products.length === 0) {
+            modalResultsBody.innerHTML = '<tr><td colspan="4">No se encontraron productos.</td></tr>';
+            return;
+        }
+        products.forEach(product => {
+            modalResultsBody.innerHTML += `
+                <tr onclick="seleccionarProducto('${product.codigo_referencia}', '${product.nombre_producto}')">
+                    <td>${product.codigo_referencia}</td>
+                    <td>${product.nombre_producto}</td>
+                    <td>${product.saldo}</td>
+                    <td>${product.ubicacion}</td>
+                </tr>
+            `;
+        });
+    }
+    function filtrarProductos() {
+        const searchTerm = modalSearchInput.value.toLowerCase();
+        const filteredProducts = allProducts.filter(product => {
+            const codigo = String(product.codigo_referencia).toLowerCase();
+            const nombre = product.nombre_producto.toLowerCase();
+            return codigo.includes(searchTerm) || nombre.includes(searchTerm);
+        });
+        renderProductList(filteredProducts);
+    }
+    function seleccionarProducto(codigo, nombre) {
+        referenciaInput.value = codigo;
+        productoInput.value = nombre;
+        cerrarModalBusqueda();
+    }
+    window.onclick = function(event) {
+        if (event.target == searchModal) {
+            cerrarModalBusqueda();
+        }
+    }
 </script>
 
 </body>
