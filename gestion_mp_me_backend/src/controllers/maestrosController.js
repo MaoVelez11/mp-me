@@ -117,7 +117,7 @@ exports.subirArchivo = async (req, res) => {
                     rowData = [
                         getSafeValue(row, 1), // n_control_qc
                         getSafeValue(row, 2), // cod_mp_me
-                        getSafeValue(row, 3), // nombre_mp_me
+                        getSafeValue(row, 3), // nombre_mp_me   
                         getSafeValue(row, 4), // lote
                         formatDateMySQL(getSafeValue(row, 5)), // fecha_recepcion
                         getSafeValue(row, 6), // proveedor
