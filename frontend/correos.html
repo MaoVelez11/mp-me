@@ -121,14 +121,14 @@
 
         if (tipo === 'recepcion') {
             id = document.getElementById('search-recepcion').value;
-            url = `${API_URL}/recepciones/${id}`;
+            url = `${API_URL}/recepciones/buscar/qc/${id}`;
             dataArea = document.getElementById('data-recepcion');
             resultArea = document.getElementById('results-recepcion');
             btn = document.getElementById('btn-recepcion');
             currentRecepcionId = null;
         } else {
             id = document.getElementById('search-movimiento').value;
-            url = `${API_URL}/movimientos/${id}`;
+            url = `${API_URL}/recepciones/buscar/qc/${id}`;
             dataArea = document.getElementById('data-movimiento');
             resultArea = document.getElementById('results-movimiento');
             btn = document.getElementById('btn-movimiento');

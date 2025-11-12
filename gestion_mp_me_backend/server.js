@@ -4,15 +4,26 @@ require('dotenv').config();
 
 const app = express();
 
-// --- LOGGER (El "Chismoso") ---
-// Esto nos mostrará en la terminal cada petición que llega
-app.use(cors({
-    origin: 'http://localhost:5500' // O la URL de tu frontend
-}));
+const listaBlanca = [
+    'http://localhost:5500',    // El que ya tenías
+    'http://127.0.0.1:5500'     // El que te está dando problemas
+];
 
-// --- MIDDLEWARES ---
-// Configuración de CORS para permitir que el frontend se conecte
-app.use(cors());
+const opcionesCors = {
+    origin: function (origin, callback) {
+        // Permitir peticiones sin 'origin' (como Postman o apps móviles)
+        if (!origin) return callback(null, true);
+        
+        if (listaBlanca.indexOf(origin) !== -1) {
+            callback(null, true); // Origen permitido
+        } else {
+            callback(new Error('No permitido por CORS')); // Origen bloqueado
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'] // Asegúrate de permitir POST
+};
+
+app.use(cors(opcionesCors));
 app.use(express.json());
 
 // --- RUTAS (ENDPOINTS) ---
