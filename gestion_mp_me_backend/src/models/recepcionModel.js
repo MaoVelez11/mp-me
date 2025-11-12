@@ -68,15 +68,15 @@ obtenerTodas: async (connection) => {
   },
 
  getByControlQC: async (n_control_qc) => {
-    // Usamos LIKE para buscar el número aunque no escriban "QC-"
-    const query = 'SELECT * FROM recepciones WHERE n_control_qc LIKE ?';
-    
-    // El '%' busca el número en cualquier parte del texto
-    const searchTerm = '%' + n_control_qc + '%';
-    
-    const [rows] = await db.query(query, [searchTerm]);
-    return rows[0];
-  },
+    // Usamos LIKE para buscar el número aunque no escriban "QC-"
+    const query = 'SELECT * FROM recepciones WHERE n_control_qc LIKE ?';
+    
+    // El '%' al inicio y al final busca el texto en cualquier parte
+    const searchTerm = '%' + n_control_qc + '%';
+    
+    const [rows] = await db.query(query, [searchTerm]);
+    return rows[0];
+  },
 };
 
 

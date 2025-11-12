@@ -1,35 +1,35 @@
 const Responsable = require('../models/responsableModel');
 
-// GET /api/responsables
+// Función que ya tenías
 exports.getAllResponsables = async (req, res) => {
   try {
     const responsables = await Responsable.getAll();
-    res.status(200).json(responsables);
+    res.json(responsables);
   } catch (error) {
     res.status(500).json({ message: 'Error en el servidor', error: error.message });
   }
 };
 
-// POST /api/responsables
-exports.createResponsable = async (req, res) => {
+// --- NUEVA FUNCIÓN ---
+exports.crearResponsable = async (req, res) => {
   try {
     const { nombre } = req.body;
     if (!nombre) {
-      return res.status(400).json({ message: 'El nombre es requerido.' });
+      return res.status(400).json({ message: 'El nombre es requerido' });
     }
-    await Responsable.create(nombre);
-    res.status(201).json({ message: 'Responsable creado exitosamente.' });
+    const newId = await Responsable.crear(nombre);
+    res.status(201).json({ message: 'Responsable creado', id: newId });
   } catch (error) {
     res.status(500).json({ message: 'Error en el servidor', error: error.message });
   }
 };
 
-// DELETE /api/responsables/:id
-exports.deleteResponsable = async (req, res) => {
+// --- NUEVA FUNCIÓN ---
+exports.eliminarResponsable = async (req, res) => {
   try {
     const { id } = req.params;
-    await Responsable.deleteById(id);
-    res.status(200).json({ message: 'Responsable eliminado exitosamente.' });
+    await Responsable.eliminar(id);
+    res.json({ message: 'Responsable eliminado' });
   } catch (error) {
     res.status(500).json({ message: 'Error en el servidor', error: error.message });
   }

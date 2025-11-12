@@ -2,12 +2,8 @@ const express = require('express');
 const router = express.Router();
 const correoController = require('../controllers/correoController');
 
-// --- Rutas Públicas (YA NO HAY NINGUNA PROTEGIDA) ---
-
-// POST /api/correos/recepcion/:id
-router.post('/recepcion/:id', correoController.enviarCorreoRecepcion);
-
-// POST /api/correos/movimiento/:id
-router.post('/movimiento/:id', correoController.enviarCorreoMovimiento);
+// Ruta única para manejar todos los envíos de correo
+// POST /api/correos/enviar
+router.post('/enviar', correoController.enviarCorreoGenerico);
 
 module.exports = router;

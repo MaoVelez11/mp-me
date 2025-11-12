@@ -3,180 +3,338 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo de Configuración</title>
+<title>Configuración del Sistema</title>
 <style>
-    body {
-        font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8;
-        color: #333; margin: 0; padding: 20px 40px;
-    }
-    .back-link {
-        display: inline-block; margin-bottom: 15px; color: #004080;
-        text-decoration: none; font-weight: 600; font-size: 16px;
-    }
-    .back-link:hover { text-decoration: underline; }
-    h1 {
-        text-align: center; background-color: #004080; color: white;
-        padding: 20px; margin: 0 0 30px 0; border-radius: 8px;
-    }
-    .container {
-        max-width: 700px; margin: 0 auto; background: white;
-        padding: 30px 40px; border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 64, 128, 0.1);
-        margin-bottom: 30px;
-    }
-    .section-title {
-        color: #004080; font-weight: 700; font-size: 20px;
-        border-bottom: 2px solid #e6f0ff; padding-bottom: 10px; margin-bottom: 20px;
-    }
-    .form-grid {
-        display: grid; grid-template-columns: 1fr 100px;
-        gap: 15px; align-items: flex-end;
-    }
-    label {
-        display: block; font-weight: 600; color: #334d6e; margin-bottom: 8px;
-    }
-    input[type="text"] {
-        width: 100%; padding: 10px; border: 1px solid #dbe5f1;
-        border-radius: 6px; box-sizing: border-box; font-size: 14px;
-    }
-    button {
-        background-color: #004080; color: white; border: none;
-        padding: 10px 15px; border-radius: 8px; cursor: pointer;
-        font-size: 14px; font-weight: 600; height: 38px;
-    }
+    /* Estilos Generales */
+    body { font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8; color: #333; margin: 0; padding: 20px 40px; }
+    .back-link { display: inline-block; margin-bottom: 15px; color: #004080; text-decoration: none; font-weight: 600; }
+    h1 { text-align: center; background-color: #004080; color: white; padding: 20px; border-radius: 8px; }
+    .container { max-width: 1000px; margin: 0 auto 30px auto; background: white; padding: 30px 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .section-title { color: #004080; font-weight: 700; font-size: 20px; border-bottom: 2px solid #e6f0ff; padding-bottom: 10px; margin-bottom: 20px; }
+    
+    /* Estilos de Formulario y Tabla */
+    .config-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 40px; }
+    .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+    .form-group { display: flex; flex-direction: column; }
+    label { font-weight: 600; color: #004080; margin-bottom: 8px; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #dbe5f1; border-radius: 6px; box-sizing: border-box; }
+    button { background-color: #004080; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
     button:hover { background-color: #0059b3; }
     
-    table {
-        width: 100%; border-collapse: collapse; margin-top: 10px;
-    }
-    th, td {
-        border: 1px solid #dbe5f1; padding: 12px;
-    }
-    th { background-color: #e6f0ff; color: #004080; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #dbe5f1; padding: 10px; text-align: left; }
+    th { background-color: #e6f0ff; }
+    .btn-danger { background-color: #dc3545; padding: 5px 10px; font-size: 12px; }
+    .btn-danger:hover { background-color: #c82333; }
     
-    .delete-btn {
-        background-color: #c82333; font-size: 12px;
-        padding: 8px 12px; color: white; border: none; border-radius: 4px; cursor: pointer;
-    }
-    .delete-btn:hover { background-color: #a71d2a; }
+    /* Feedback */
+    #feedback-message { text-align: center; padding: 15px; margin-top: 20px; border-radius: 8px; font-weight: 600; display: none; }
+    .success { background-color: #d4edda; color: #155724; }
+    .error { background-color: #f8d7da; color: #721c24; }
 </style>
 </head>
 <body>
 
     <a href="index.html" class="back-link">← Volver al Panel Principal</a>
-    <h1>Gestión de Datos Maestros</h1>
+    <h1>Configuración de Correos</h1>
+    <div id="feedback-message"></div>
 
     <div class="container">
-        <h2 class="section-title">Gestionar Responsables de Aprob. QC</h2>
-        
-        <form id="addForm">
-            <div class="form-grid">
-                <div>
-                    <label for="nombre">Nombre del Responsable</label>
-                    <input type="text" id="nombre" required>
-                </div>
-                <button type="submit">Agregar</button>
+        <div class="config-grid">
+            
+            <div>
+                <h2 class="section-title">Agregar Remitente (Enviar Desde)</h2>
+                <form id="formAddRemitente" class="form-grid">
+                    <div class="form-group">
+                        <label for="rem-clave">Clave Única (en .env)</label>
+                        <input type="text" id="rem-clave" placeholder="Ej: logistica" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rem-nombre">Nombre Visible</label>
+                        <input type="text" id="rem-nombre" placeholder="Ej: Logística y Almacén" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rem-email">Dirección de Correo</label>
+                        <input type="email" id="rem-email" placeholder="Ej: logistica@empresa.com" required>
+                    </div>
+                    <button type="submit">Agregar Remitente</button>
+                </form>
             </div>
-        </form>
-        
-        <hr style="border:0; border-top: 1px solid #eee; margin: 25px 0;">
-        
-        <table>
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th style="width: 80px;">Acción</th>
-                </tr>
-            </thead>
-            <tbody id="responsables-list-body">
-                <tr><td colspan="2">Cargando...</td></tr>
-            </tbody>
-        </table>
+            
+            <div>
+                <h2 class="section-title">Remitentes Actuales</h2>
+                <div style="max-height: 300px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Clave (.env)</th>
+                                <th>Nombre Visible</th>
+                                <th>Correo</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-remitentes">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="config-grid">
+
+            <div>
+                <h2 class="section-title">Agregar Destinatario (Enviar Para)</h2>
+                <form id="formAddDestinatario" class="form-grid">
+                    <div class="form-group">
+                        <label for="dest-tipo">Tipo de Correo</label>
+                        <select id="dest-tipo" required>
+                            <option value="">Seleccione...</option>
+                            <option value="recepcion">Recepción</option>
+                            <option value="movimiento">Movimiento (Dev/Consumo)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dest-email">Dirección de Correo</label>
+                        <input type="email" id="dest-email" placeholder="Ej: compras@empresa.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dest-desc">Descripción (Opcional)</label>
+                        <input type="text" id="dest-desc" placeholder="Ej: Jefe de Compras">
+                    </div>
+                    <button type="submit">Agregar Destinatario</button>
+                </form>
+            </div>
+
+            <div>
+                <h2 class="section-title">Listas de Destinatarios Actuales</h2>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Correo</th>
+                                <th>Descripción</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-destinatarios">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="config-grid">
+            
+            <div>
+                <h2 class="section-title">Agregar Responsable (Aprob. QC)</h2>
+                <form id="formAddResponsable" class="form-grid">
+                    <div class="form-group">
+                        <label for="resp-nombre">Nombre del Responsable</label>
+                        <input type="text" id="resp-nombre" placeholder="Ej: Juan Camilo Cardona" required>
+                    </div>
+                    <button type="submit">Agregar Responsable</button>
+                </form>
+            </div>
+            
+            <div>
+                <h2 class="section-title">Responsables Actuales</h2>
+                <div style="max-height: 300px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-responsables">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
 <script>
-    const API_URL = 'http://localhost:3000/api';
-    // const token = ...  <-- YA NO EXISTE
+    const API_CONFIG_URL = 'http://localhost:3000/api/configuracion';
+    const API_RESPONSABLES_URL = 'http://localhost:3000/api/responsables';
+    const feedback = document.getElementById('feedback-message');
 
+    // --- MOSTRAR FEEDBACK ---
+    function showFeedback(message, isError = false) {
+        feedback.textContent = message;
+        feedback.className = isError ? 'error' : 'success';
+        feedback.style.display = 'block';
+        setTimeout(() => { feedback.style.display = 'none'; }, 3000);
+    }
+
+    // --- LÓGICA DE REMITENTES ---
+    const formRemitente = document.getElementById('formAddRemitente');
+    const tablaRemitentes = document.getElementById('tabla-remitentes');
+
+    async function loadRemitentes() {
+        try {
+            const res = await fetch(`${API_CONFIG_URL}/remitentes`);
+            const remitentes = await res.json();
+            
+            tablaRemitentes.innerHTML = '';
+            remitentes.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${r.clave}</td>
+                    <td>${r.nombre_visible}</td>
+                    <td>${r.email_address}</td>
+                    <td><button class="btn-danger" onclick="deleteRemitente(${r.id})">X</button></td>
+                `;
+                tablaRemitentes.appendChild(tr);
+            });
+        } catch (e) { console.error('Error cargando remitentes:', e); }
+    }
+
+    formRemitente.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+            clave: document.getElementById('rem-clave').value,
+            nombre_visible: document.getElementById('rem-nombre').value,
+            email_address: document.getElementById('rem-email').value
+        };
+        
+        try {
+            const res = await fetch(`${API_CONFIG_URL}/remitentes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) throw new Error('Error del servidor');
+            
+            showFeedback('Remitente agregado con éxito.', false);
+            formRemitente.reset();
+            loadRemitentes();
+        } catch (e) { showFeedback('Error: ' + e.message, true); }
+    });
+
+    async function deleteRemitente(id) {
+        if (!confirm('¿Seguro que deseas eliminar este remitente?')) return;
+        try {
+            await fetch(`${API_CONFIG_URL}/remitentes/${id}`, { method: 'DELETE' });
+            showFeedback('Remitente eliminado.', false);
+            loadRemitentes();
+        } catch (e) { showFeedback('Error: ' + e.message, true); }
+    }
+
+    // --- LÓGICA DE DESTINATARIOS ---
+    const formDestinatario = document.getElementById('formAddDestinatario');
+    const tablaDestinatarios = document.getElementById('tabla-destinatarios');
+
+    async function loadDestinatarios() {
+        try {
+            const res = await fetch(`${API_CONFIG_URL}/destinatarios`);
+            const destinatarios = await res.json();
+            
+            tablaDestinatarios.innerHTML = '';
+            destinatarios.forEach(d => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${d.tipo_correo}</td>
+                    <td>${d.email_address}</td>
+                    <td>${d.descripcion || ''}</td>
+                    <td><button class="btn-danger" onclick="deleteDestinatario(${d.id})">X</button></td>
+                `;
+                tablaDestinatarios.appendChild(tr);
+            });
+        } catch (e) { console.error('Error cargando destinatarios:', e); }
+    }
+
+    formDestinatario.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+            tipo_correo: document.getElementById('dest-tipo').value,
+            email_address: document.getElementById('dest-email').value,
+            descripcion: document.getElementById('dest-desc').value
+        };
+
+        try {
+            const res = await fetch(`${API_CONFIG_URL}/destinatarios`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) throw new Error('Error del servidor');
+            
+            showFeedback('Destinatario agregado con éxito.', false);
+            formDestinatario.reset();
+            loadDestinatarios();
+        } catch (e) { showFeedback('Error: ' + e.message, true); }
+    });
+
+    async function deleteDestinatario(id) {
+        if (!confirm('¿Seguro que deseas eliminar este destinatario?')) return;
+        try {
+            await fetch(`${API_CONFIG_URL}/destinatarios/${id}`, { method: 'DELETE' });
+            showFeedback('Destinatario eliminado.', false);
+            loadDestinatarios();
+        } catch (e) { showFeedback('Error: ' + e.message, true); }
+    }
+
+    // --- LÓGICA DE RESPONSABLES (QC) ---
+    const formResponsable = document.getElementById('formAddResponsable');
+    const tablaResponsables = document.getElementById('tabla-responsables');
+
+    async function loadResponsables() {
+        try {
+            const res = await fetch(API_RESPONSABLES_URL);
+            const responsables = await res.json();
+            
+            tablaResponsables.innerHTML = '';
+            responsables.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${r.nombre}</td>
+                    <td><button class="btn-danger" onclick="deleteResponsable(${r.id})">X</button></td>
+                `;
+                tablaResponsables.appendChild(tr);
+            });
+        } catch (e) { console.error('Error cargando responsables:', e); }
+    }
+
+    formResponsable.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nombre = document.getElementById('resp-nombre').value;
+        if (!nombre) return;
+        
+        try {
+            const res = await fetch(API_RESPONSABLES_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre: nombre })
+            });
+            if (!res.ok) throw new Error('Error del servidor');
+            
+            showFeedback('Responsable agregado con éxito.', false);
+            formResponsable.reset();
+            loadResponsables();
+        } catch (e) { showFeedback('Error: ' + e.message, true); }
+    });
+
+    async function deleteResponsable(id) {
+        if (!confirm('¿Seguro que deseas eliminar este responsable?')) return;
+        try {
+            await fetch(`${API_RESPONSABLES_URL}/${id}`, { method: 'DELETE' });
+            showFeedback('Responsable eliminado.', false);
+            loadResponsables();
+        } catch (e) { showFeedback('Error: ' + e.message, true); }
+    }
+
+    // --- Carga Inicial ---
     document.addEventListener('DOMContentLoaded', () => {
+        loadRemitentes();
+        loadDestinatarios();
         loadResponsables();
     });
-
-    // 1. CARGAR LISTA
-    async function loadResponsables() {
-        const tbody = document.getElementById('responsables-list-body');
-        try {
-            const response = await fetch(`${API_URL}/responsables`);
-            if (!response.ok) throw new Error('No se pudo cargar la lista.');
-            
-            const responsables = await response.json();
-            tbody.innerHTML = '';
-
-            if(responsables.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="2">No hay responsables registrados.</td></tr>';
-            }
-            
-            responsables.forEach(resp => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${resp.nombre}</td>
-                        <td>
-                            <button class="delete-btn" onclick="deleteResponsable(${resp.id_responsable}, '${resp.nombre}')">
-                                Borrar
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-        } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="2" style="color: red;">${error.message}</td></tr>`;
-        }
-    }
-
-    // 2. AGREGAR
-    document.getElementById('addForm').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const nombreInput = document.getElementById('nombre');
-        const nombre = nombreInput.value;
-
-        if (!nombre) return alert('Debe completar el nombre.');
-
-        try {
-            const response = await fetch(`${API_URL}/responsables`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }, // <-- SIN HEADER DE AUTORIZACIÓN
-                body: JSON.stringify({ nombre })
-            });
-
-            if (!response.ok) throw new Error('Error al crear el responsable.');
-            
-            nombreInput.value = '';
-            loadResponsables();
-        } catch (error) {
-            alert(error.message);
-        }
-    });
-
-    // 3. ELIMINAR
-    async function deleteResponsable(id, nombre) {
-        if (!confirm(`¿Está seguro de que desea eliminar a '${nombre}'?`)) {
-            return;
-        }
-
-        try {
-            const response = await fetch(`${API_URL}/responsables/${id}`, {
-                method: 'DELETE'
-                // <-- SIN HEADER DE AUTORIZACIÓN
-            });
-
-            if (!response.ok) throw new Error('Error al eliminar.');
-            
-            loadResponsables();
-        } catch (error) {
-            alert(error.message);
-        }
-    }
 </script>
-
 </body>
 </html>

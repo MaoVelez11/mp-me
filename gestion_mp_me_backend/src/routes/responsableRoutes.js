@@ -2,15 +2,15 @@ const express = require('express');
 const router = express.Router();
 const responsableController = require('../controllers/responsableController');
 
-// --- Rutas Públicas (YA NO HAY NINGUNA PROTEGIDA) ---
-
-// GET /api/responsables
+// Ruta que ya tenías (para cargar el dropdown en recepcion.html)
 router.get('/', responsableController.getAllResponsables);
 
-// POST /api/responsables
-router.post('/', responsableController.createResponsable);
+// --- NUEVA RUTA ---
+// Para crear un responsable desde configuracion.html
+router.post('/', responsableController.crearResponsable);
 
-// DELETE /api/responsables/:id
-router.delete('/:id', responsableController.deleteResponsable);
+// --- NUEVA RUTA ---
+// Para eliminar un responsable desde configuracion.html
+router.delete('/:id', responsableController.eliminarResponsable);
 
 module.exports = router;

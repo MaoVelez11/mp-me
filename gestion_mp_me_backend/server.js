@@ -30,6 +30,9 @@ app.use(express.json());
 const recepcionRoutes = require('./src/routes/recepcionRoutes');
 app.use('/api/recepciones', recepcionRoutes);
 
+const configuracionRoutes = require('./src/routes/configuracionRoutes');
+app.use('/api/configuracion', configuracionRoutes);
+
 const movimientoRoutes = require('./src/routes/movimientoRoutes');
 app.use('/api/movimientos', movimientoRoutes);
 

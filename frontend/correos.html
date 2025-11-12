@@ -5,67 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel de Envío de Correos</title>
 <style>
-    body {
-        font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8;
-        color: #333; margin: 0; padding: 20px 40px;
-    }
-    .back-link {
-        display: inline-block; margin-bottom: 15px; color: #004080;
-        text-decoration: none; font-weight: 600; font-size: 16px;
-    }
-    .back-link:hover { text-decoration: underline; }
-    h1 {
-        text-align: center; background-color: #004080; color: white;
-        padding: 20px; margin: 0 0 30px 0; border-radius: 8px;
-    }
-    .container {
-        max-width: 800px; margin: 0 auto 30px auto; background: white;
-        padding: 30px 40px; border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 64, 128, 0.1);
-    }
-    .section-title {
-        color: #004080; font-weight: 700; font-size: 20px;
-        border-bottom: 2px solid #e6f0ff; padding-bottom: 10px; margin-bottom: 20px;
-    }
-    .search-form {
-        display: grid; grid-template-columns: 1fr 150px;
-        gap: 15px; margin-bottom: 20px;
-    }
-    input[type="text"] {
-        width: 100%; padding: 10px; border: 1px solid #dbe5f1;
-        border-radius: 6px; box-sizing: border-box; font-size: 14px;
-    }
-    button {
-        background-color: #004080; color: white; border: none;
-        padding: 10px 15px; border-radius: 8px; cursor: pointer;
-        font-size: 14px; font-weight: 600;
-    }
+    /* ... (Todos tus estilos de CSS van aquí, no cambian) ... */
+    body { font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8; color: #333; margin: 0; padding: 20px 40px; }
+    .back-link { display: inline-block; margin-bottom: 15px; color: #004080; text-decoration: none; font-weight: 600; font-size: 16px; }
+    h1 { text-align: center; background-color: #004080; color: white; padding: 20px; margin: 0 0 30px 0; border-radius: 8px; }
+    .container { max-width: 800px; margin: 0 auto 30px auto; background: white; padding: 30px 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 64, 128, 0.1); }
+    .section-title { color: #004080; font-weight: 700; font-size: 20px; border-bottom: 2px solid #e6f0ff; padding-bottom: 10px; margin-bottom: 20px; }
+    .search-form { display: grid; grid-template-columns: 1fr 150px; gap: 15px; margin-bottom: 20px; }
+    input[type="text"], input[type="email"], select { width: 100%; padding: 10px; border: 1px solid #dbe5f1; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+    button { background-color: #004080; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; }
     button:hover { background-color: #0059b3; }
-    
-    .results-area {
-        background-color: #f9fbfd;
-        border: 1px solid #e0e7ee;
-        border-radius: 8px;
-        padding: 20px;
-        display: none; 
-    }
-    .results-area pre {
-        background-color: #eee; padding: 15px;
-        border-radius: 5px; white-space: pre-wrap; 
-    }
-    .send-btn {
-        background-color: #198754; font-size: 16px;
-        padding: 12px 20px; margin-top: 15px;
-    }
+    .results-area { background-color: #f9fbfd; border: 1px solid #e0e7ee; border-radius: 8px; padding: 20px; display: none; }
+    .results-area pre { background-color: #eee; padding: 15px; border-radius: 5px; white-space: pre-wrap; }
+    .send-btn { background-color: #198754; font-size: 16px; padding: 12px 20px; margin-top: 15px; }
     .send-btn:hover { background-color: #157347; }
     .send-btn:disabled { background-color: #ccc; cursor: not-allowed; }
-
-    #feedback-message {
-        text-align: center; padding: 10px;
-        border-radius: 8px; font-weight: 600; display: none;
-    }
+    #feedback-message { text-align: center; padding: 10px; border-radius: 8px; font-weight: 600; display: none; }
     #feedback-message.success { background-color: #d4edda; color: #155724; }
     #feedback-message.error { background-color: #f8d7da; color: #721c24; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { font-weight: 600; display: block; margin-bottom: 5px; color: #333; }
+    .recipient-tags { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; border: 1px solid #dbe5f1; border-radius: 6px; min-height: 40px; }
+    .recipient-tag { background-color: #004080; color: white; padding: 5px 10px; border-radius: 20px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    .recipient-tag span { cursor: pointer; font-weight: bold; }
+    #add-recipient-input { border: none; outline: none; flex-grow: 1; padding: 5px; font-size: 14px; min-width: 150px; }
 </style>
 </head>
 <body>
@@ -80,9 +43,24 @@
             <input type="text" id="search-recepcion" placeholder="Escribe el N° de Control QC (ej. 0001)...">
             <button onclick="buscar('recepcion')">Buscar</button>
         </div>
+        
         <div id="results-recepcion" class="results-area">
             <h4>Datos Encontrados:</h4>
             <pre id="data-recepcion"></pre>
+            
+            <div class="form-group">
+                <label for="sender-recepcion">Enviar desde:</label>
+                <select id="sender-recepcion">
+                    <option value="">Cargando remitentes...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Destinatarios (Presiona Enter para agregar):</label>
+                <div class="recipient-tags" id="tags-recepcion">
+                    <input type="email" id="add-recipient-recepcion" class="add-recipient-input" placeholder="Añadir otro correo...">
+                </div>
+            </div>
+            
             <button id="btn-recepcion" class="send-btn" onclick="enviarCorreo('recepcion')">
                 📧 Enviar Correo Recepción
             </button>
@@ -95,9 +73,24 @@
             <input type="text" id="search-movimiento" placeholder="Escribe el ID del movimiento...">
             <button onclick="buscar('movimiento')">Buscar</button>
         </div>
+        
         <div id="results-movimiento" class="results-area">
             <h4>Datos Encontrados:</h4>
             <pre id="data-movimiento"></pre>
+            
+            <div class="form-group">
+                <label for="sender-movimiento">Enviar desde:</label>
+                <select id="sender-movimiento">
+                    <option value="">Cargando remitentes...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Destinatarios (Presiona Enter para agregar):</label>
+                <div class="recipient-tags" id="tags-movimiento">
+                    <input type="email" id="add-recipient-movimiento" class="add-recipient-input" placeholder="Añadir otro correo...">
+                </div>
+            </div>
+
             <button id="btn-movimiento" class="send-btn" onclick="enviarCorreo('movimiento')">
                 📧 Enviar Correo Movimiento
             </button>
@@ -106,17 +99,62 @@
 
 <script>
     const API_URL = 'http://localhost:3000/api';
-    // const token = ... <-- YA NO EXISTE
+    
     let currentRecepcionId = null;
     let currentMovimientoId = null;
+    
+    let recipientsRecepcion = [];
+    let recipientsMovimiento = [];
+
+    // --- CAMBIO AQUÍ: Variables globales para la configuración ---
+    let allRemitentes = []; // Guardará { clave: 'logistica', nombre_visible: 'Logística...' }
+    let allDestinatarios = { recepcion: [], movimiento: [] }; // Guardará las listas
+    
     const feedbackMessage = document.getElementById('feedback-message');
 
-    document.getElementById('results-recepcion').style.display = 'none';
-    document.getElementById('results-movimiento').style.display = 'none';
+    // --- CARGA INICIAL (MODIFICADA) ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Cargamos la configuración de correos al iniciar la página
+        loadEmailConfig();
+    });
 
+    async function loadEmailConfig() {
+        try {
+            // 1. Cargar los Remitentes (Para los <select>)
+            const resRemitentes = await fetch(`${API_URL}/configuracion/remitentes`);
+            allRemitentes = await resRemitentes.json();
+            populateRemitenteDropdowns();
+
+            // 2. Cargar los Destinatarios (Para las listas pre-cargadas)
+            const resDestinatarios = await fetch(`${API_URL}/configuracion/destinatarios/agrupados`);
+            allDestinatarios = await resDestinatarios.json();
+        } catch (e) {
+            console.error("Error fatal cargando configuración de correos", e);
+            alert("Error: No se pudo cargar la configuración de correos. Revise la consola.");
+        }
+    }
+
+    function populateRemitenteDropdowns() {
+        const selectRecepcion = document.getElementById('sender-recepcion');
+        const selectMovimiento = document.getElementById('sender-movimiento');
+        selectRecepcion.innerHTML = '';
+        selectMovimiento.innerHTML = '';
+
+        if (allRemitentes.length === 0) {
+            selectRecepcion.innerHTML = '<option value="">No hay remitentes</option>';
+            selectMovimiento.innerHTML = '<option value="">No hay remitentes</option>';
+            return;
+        }
+
+        allRemitentes.forEach(remitente => {
+            const option = `<option value="${remitente.clave}">${remitente.nombre_visible} (${remitente.email_address})</option>`;
+            selectRecepcion.innerHTML += option;
+            selectMovimiento.innerHTML += option;
+        });
+    }
+
+    // --- LÓGICA DE BÚSQUEDA (MODIFICADA) ---
     async function buscar(tipo) {
-        // --- SE ELIMINÓ LA COMPROBACIÓN DEL TOKEN ---
-        
         let id, url, dataArea, resultArea, btn;
 
         if (tipo === 'recepcion') {
@@ -126,13 +164,19 @@
             resultArea = document.getElementById('results-recepcion');
             btn = document.getElementById('btn-recepcion');
             currentRecepcionId = null;
+            // --- CAMBIO AQUÍ: Carga la lista desde la BD ---
+            recipientsRecepcion = [...allDestinatarios.recepcion] || []; // Copia la lista
+            renderTags('recepcion');
         } else {
             id = document.getElementById('search-movimiento').value;
-            url = `${API_URL}/recepciones/buscar/qc/${id}`;
+            url = `${API_URL}/movimientos/${id}`; 
             dataArea = document.getElementById('data-movimiento');
             resultArea = document.getElementById('results-movimiento');
             btn = document.getElementById('btn-movimiento');
             currentMovimientoId = null;
+            // --- CAMBIO AQUÍ: Carga la lista desde la BD ---
+            recipientsMovimiento = [...allDestinatarios.movimiento] || []; // Copia la lista
+            renderTags('movimiento');
         }
 
         if (!id) {
@@ -141,7 +185,7 @@
         }
 
         try {
-            const response = await fetch(url); // <-- SIN HEADER DE AUTORIZACIÓN
+            const response = await fetch(url);
             if (response.status === 404) throw new Error('Registro no encontrado.');
             if (!response.ok) throw new Error('Error al buscar el registro.');
             
@@ -152,7 +196,7 @@
             btn.disabled = false;
 
             if (tipo === 'recepcion') {
-                currentRecepcionId = data.id_recepcion;
+                currentRecepcionId = data.id_recepcion; 
             } else {
                 currentMovimientoId = data.id_movimiento;
             }
@@ -163,29 +207,33 @@
         }
     }
 
+    // --- LÓGICA DE ENVÍO (SIN CAMBIOS) ---
+    // (Tu función enviarCorreo(tipo) que te di en el Paso 4 es correcta y no necesita cambios)
     async function enviarCorreo(tipo) {
-        // --- SE ELIMINÓ LA COMPROBACIÓN DEL TOKEN ---
-        
-        const email = prompt("Ingrese el correo del destinatario:");
-        if (!email) {
-            alert("Envío cancelado.");
-            return;
-        }
-
-        let id, url, btn;
+        let recordId, senderKey, recipients, url, btn, tipoCorreo;
         
         if (tipo === 'recepcion') {
-            id = currentRecepcionId;
-            url = `${API_URL}/correos/recepcion/${id}`;
+            recordId = currentRecepcionId;
+            senderKey = document.getElementById('sender-recepcion').value;
+            recipients = recipientsRecepcion;
             btn = document.getElementById('btn-recepcion');
+            tipoCorreo = 'recepcion';
         } else {
-            id = currentMovimientoId;
-            url = `${API_URL}/correos/movimiento/${id}`;
+            recordId = currentMovimientoId;
+            senderKey = document.getElementById('sender-movimiento').value;
+            recipients = recipientsMovimiento;
             btn = document.getElementById('btn-movimiento');
+            tipoCorreo = 'movimiento';
         }
 
-        if (!id) {
+        url = `${API_URL}/correos/enviar`; // Usamos la nueva ruta genérica
+
+        if (!recordId) {
             alert('Error: No hay un registro seleccionado.');
+            return;
+        }
+        if (recipients.length === 0) {
+            alert('Debe haber al menos un destinatario.');
             return;
         }
 
@@ -193,23 +241,27 @@
         btn.textContent = 'Enviando...';
         feedbackMessage.style.display = 'none';
 
+        const bodyData = {
+            tipoCorreo: tipoCorreo,
+            recordId: recordId,
+            senderKey: senderKey,
+            recipients: recipients
+        };
+
         try {
             const response = await fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                    // <-- SIN HEADER DE AUTORIZACIÓN
-                },
-                body: JSON.stringify({ email: email })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bodyData)
             });
             
-            if (!response.ok) throw new Error('Error en el servidor al enviar el correo.');
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error en el servidor al enviar el correo.');
             
             feedbackMessage.textContent = '¡Correo enviado exitosamente!';
             feedbackMessage.className = 'success';
             feedbackMessage.style.display = 'block';
             btn.textContent = '¡Enviado!';
-            btn.style.backgroundColor = 'green';
             
         } catch (error) {
             feedbackMessage.textContent = error.message;
@@ -219,7 +271,72 @@
             btn.textContent = `📧 Enviar Correo ${tipo}`;
         }
     }
-</script>
 
+    // --- LÓGICA PARA LOS TAGS DE DESTINATARIOS (SIN CAMBIOS) ---
+    // (Tus funciones renderTags, addTag, removeTag, etc. van aquí)
+
+    function renderTags(tipo) {
+        let containerId, list;
+        if (tipo === 'recepcion') {
+            containerId = 'tags-recepcion';
+            list = recipientsRecepcion;
+        } else {
+            containerId = 'tags-movimiento';
+            list = recipientsMovimiento;
+        }
+
+        const tagContainer = document.getElementById(containerId);
+        tagContainer.querySelectorAll('.recipient-tag').forEach(tag => tag.remove());
+
+        list.forEach(email => {
+            const tag = document.createElement('div');
+            tag.className = 'recipient-tag';
+            tag.innerHTML = `${email} <span onclick="removeTag('${tipo}', '${email}')">&times;</span>`;
+            tagContainer.insertBefore(tag, tagContainer.querySelector('.add-recipient-input'));
+        });
+    }
+
+    function addTag(tipo, email) {
+        if (!email || !validateEmail(email)) return;
+        
+        if (tipo === 'recepcion') {
+            if (!recipientsRecepcion.includes(email)) {
+                recipientsRecepcion.push(email);
+                renderTags('recepcion');
+            }
+        } else {
+            if (!recipientsMovimiento.includes(email)) {
+                recipientsMovimiento.push(email);
+                renderTags('movimiento');
+            }
+        }
+    }
+
+    function removeTag(tipo, email) {
+        if (tipo === 'recepcion') {
+            recipientsRecepcion = recipientsRecepcion.filter(r => r !== email);
+            renderTags('recepcion');
+        } else {
+            recipientsMovimiento = recipientsMovimiento.filter(r => r !== email);
+            renderTags('movimiento');
+        }
+    }
+    
+    ['recepcion', 'movimiento'].forEach(tipo => {
+        const input = document.getElementById(`add-recipient-${tipo}`);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addTag(tipo, e.target.value);
+                e.target.value = '';
+            }
+        });
+    });
+
+    function validateEmail(email) {
+        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(email).toLowerCase());
+    }
+</script>
 </body>
 </html>
