@@ -65,7 +65,7 @@ const getFromAddress = async (senderKey) => {
 };
 
 
-// --- 2. FUNCIÓN DE LOG (Sin cambios) ---
+// --- 2. FUNCIÓN DE LOG ) ---
 async function logEmail(tipo, senderKey, recipients, datos, estado, errorInfo = null) {
     // (Tu función de log que te di en el Paso 2 va aquí)
     // ...
@@ -79,7 +79,7 @@ async function logEmail(tipo, senderKey, recipients, datos, estado, errorInfo = 
     }
 }
 
-// --- 3. PLANTILLA DE RECEPCIÓN (Modificada) ---
+// --- 3. PLANTILLA DE RECEPCIÓN  ---
 exports.sendReceptionEmail = async (data, senderKey, recipientList) => {
     const tipo = 'Recepción';
     const transporter = transporters[senderKey]; // Selecciona el transportador dinámico
@@ -106,7 +106,7 @@ exports.sendReceptionEmail = async (data, senderKey, recipientList) => {
     }
 };
 
-// --- 4. PLANTILLA DE MOVIMIENTO (Modificada) ---
+// --- 4. PLANTILLA DE MOVIMIENTO  ---
 exports.sendMovementEmail = async (data, senderKey, recipientList) => {
     const tipo = data.tipo_movimiento || 'Movimiento';
     const transporter = transporters[senderKey];

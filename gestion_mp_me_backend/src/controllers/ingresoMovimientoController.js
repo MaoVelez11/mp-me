@@ -6,7 +6,7 @@ exports.crearMovimiento = async (req, res) => {
   try {
     const movimientoData = req.body; // Espera: { referencia, producto, lote, cantidad }
     
-    // Validar datos (puedes añadir más)
+    // Validar datos 
     if (!movimientoData.referencia || !movimientoData.producto || !movimientoData.cantidad) {
          return res.status(400).json({ message: 'Referencia, Producto y Cantidad son requeridos.' });
     }

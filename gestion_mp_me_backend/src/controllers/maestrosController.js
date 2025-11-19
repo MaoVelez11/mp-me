@@ -66,7 +66,7 @@ function getSafeValue(row, colIndex) {
     return val;
 }
 
-// --- FUNCIÓN 3: LÓGICA DE SUBIDA (MODIFICADA) ---
+// --- FUNCIÓN 3: LÓGICA DE SUBIDA ---
 exports.subirArchivo = async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: 'No se subió ningún archivo.' });

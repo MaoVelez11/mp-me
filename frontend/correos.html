@@ -106,15 +106,14 @@
     let recipientsRecepcion = [];
     let recipientsMovimiento = [];
 
-    // --- CAMBIO AQUÍ: Variables globales para la configuración ---
+    // --- Variables globales para la configuración ---
     let allRemitentes = []; // Guardará { clave: 'logistica', nombre_visible: 'Logística...' }
-    let allDestinatarios = { recepcion: [], movimiento: [] }; // Guardará las listas
+    let allDestinatarios = { recepcion: [], movimiento: [] }; // Guarda las listas
     
     const feedbackMessage = document.getElementById('feedback-message');
 
-    // --- CARGA INICIAL (MODIFICADA) ---
+    // --- CARGA INICIAL ---
     document.addEventListener('DOMContentLoaded', () => {
-        // Cargamos la configuración de correos al iniciar la página
         loadEmailConfig();
     });
 
@@ -153,7 +152,7 @@
         });
     }
 
-    // --- LÓGICA DE BÚSQUEDA (MODIFICADA) ---
+    // --- LÓGICA DE BÚSQUEDA ---
     async function buscar(tipo) {
         let id, url, dataArea, resultArea, btn;
 
@@ -164,7 +163,7 @@
             resultArea = document.getElementById('results-recepcion');
             btn = document.getElementById('btn-recepcion');
             currentRecepcionId = null;
-            // --- CAMBIO AQUÍ: Carga la lista desde la BD ---
+            
             recipientsRecepcion = [...allDestinatarios.recepcion] || []; // Copia la lista
             renderTags('recepcion');
         } else {
@@ -174,7 +173,7 @@
             resultArea = document.getElementById('results-movimiento');
             btn = document.getElementById('btn-movimiento');
             currentMovimientoId = null;
-            // --- CAMBIO AQUÍ: Carga la lista desde la BD ---
+            
             recipientsMovimiento = [...allDestinatarios.movimiento] || []; // Copia la lista
             renderTags('movimiento');
         }
@@ -207,8 +206,8 @@
         }
     }
 
-    // --- LÓGICA DE ENVÍO (SIN CAMBIOS) ---
-    // (Tu función enviarCorreo(tipo) que te di en el Paso 4 es correcta y no necesita cambios)
+    // --- LÓGICA DE ENVÍO ---
+    
     async function enviarCorreo(tipo) {
         let recordId, senderKey, recipients, url, btn, tipoCorreo;
         
@@ -272,8 +271,8 @@
         }
     }
 
-    // --- LÓGICA PARA LOS TAGS DE DESTINATARIOS (SIN CAMBIOS) ---
-    // (Tus funciones renderTags, addTag, removeTag, etc. van aquí)
+    // --- LÓGICA PARA LOS TAGS DE DESTINATARIOS  ---
+    // (funciones renderTags, addTag, removeTag, etc. van aquí)
 
     function renderTags(tipo) {
         let containerId, list;

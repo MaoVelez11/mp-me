@@ -48,10 +48,9 @@ app.use('/api/maestros', maestrosRoutes);
 const correoRoutes = require('./src/routes/correoRoutes');
 app.use('/api/correos', correoRoutes);
 
-// --- LA RUTA NUEVA QUE ESTABA FALLANDO ---
 const ingresoMovimientoRoutes = require('./src/routes/ingresoMovimientoRoutes.js');
 app.use('/api/ingreso-movimiento', ingresoMovimientoRoutes);
-// ----------------------------------------
+
 
 // Ruta de prueba general
 app.get('/', (req, res) => {

@@ -44,7 +44,7 @@
         font-size: 16px; font-weight: 600; margin-top: 20px;
     }
     
-    /* --- Estilos del Buscador y Modal (Limpiados) --- */
+    /* --- Estilos del Buscador y Modal --- */
     .search-container { position: relative; display: flex; width: 100%; }
     .search-container input { padding-right: 40px; }
     .search-icon {
@@ -212,7 +212,7 @@
         });
     });
 
-    // --- Funciones del Modal (sin cambios) ---
+    // --- Funciones del Modal ---
     async function loadAllProducts() {
         try {
             const response = await fetch('http://localhost:3000/api/inventario');
