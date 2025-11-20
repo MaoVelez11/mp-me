@@ -49,5 +49,27 @@ const Recepcion = {
     return rows[0];
   },
 };
+obtenerTodas: async (connection) => {
+    const conn = connection || db;
+    
+    // Hacemos el JOIN entre items y el encabezado
+    const query = `
+      SELECT 
+        ri.codigo_mp,        -- Nombre exacto en la tabla nueva
+        ri.nombre_mp,        -- Nombre exacto en la tabla nueva
+        ri.lote,             -- Nombre exacto en la tabla nueva
+        ri.cantidad_peso,    -- Nombre exacto en la tabla nueva
+        r.fecha_recepcion    -- Fecha desde la tabla maestra
+      FROM 
+        recepcion_items AS ri
+      JOIN 
+        recepciones AS r ON ri.id_recepcion = r.id_recepcion
+      ORDER BY 
+        r.id_recepcion DESC;
+    `;
+    
+    const [rows] = await conn.query(query);
+    return rows;
+  },
 
 module.exports = Recepcion;

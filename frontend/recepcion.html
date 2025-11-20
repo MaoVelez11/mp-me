@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Recepción de MP - ME (Multiproducto)</title>
 <style>
-    /* Tus estilos generales (body, h1, etc.) */
+    /* Estilos Generales */
     body { font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8; color: #333; margin: 0; padding: 20px 40px; }
     .back-link { display: inline-block; margin-bottom: 15px; color: #004080; text-decoration: none; font-weight: 600; }
     h1 { text-align: center; background-color: #004080; color: white; padding: 20px; border-radius: 8px; }
@@ -41,7 +41,24 @@
     .success { background-color: #d4edda; color: #155724; }
     .error { background-color: #f8d7da; color: #721c24; }
 
-    /* ...Tus estilos de Modal y Buscador... */
+    /* Estilos del Buscador (Lupa) */
+    .search-container { position: relative; display: flex; width: 100%; }
+    .search-container input { padding-right: 40px; width: 100%; }
+    .search-icon { 
+        position: absolute; right: 1px; top: 1px; bottom: 1px; width: 38px; 
+        display: flex; align-items: center; justify-content: center; cursor: pointer; 
+        background: #e9ecef; border-radius: 0 6px 6px 0; border-left: 1px solid #dbe5f1; 
+    }
+    .search-icon:hover { background-color: #d0d6db; }
+
+    /* Modal */
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+    .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 700px; }
+    .close-btn { float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+    #modal-results-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    #modal-results-table th, #modal-results-table td { border: 1px solid #ddd; padding: 8px; }
+    #modal-results-table th { background-color: #e6f0ff; }
+    #modal-results-table tr:hover { background-color: #f0f4f8; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -53,7 +70,6 @@
     <div class="container">
         <h2 class="section-title" style="margin-top:0;">1. Datos Principales de la Recepción</h2>
         <div class="form-grid">
-            
             <div class="form-group">
                 <label>N° Control QC (Automático)</label>
                 <input type="text" id="n_control_qc" readonly placeholder="Cargando...">
@@ -93,11 +109,17 @@
         <div class="form-grid">
             <div class="form-group">
                 <label>Código MP / ME</label>
-                <input type="text" id="item-cod_mp_me" required>
+                <div class="search-container">
+                    <input type="text" id="item-cod_mp_me" required>
+                    <span class="search-icon" onclick="abrirModal()">🔍</span>
                 </div>
+            </div>
             <div class="form-group">
                 <label>Nombre de la MP / ME</label>
-                <input type="text" id="item-nombre_mp_me" required>
+                <div class="search-container">
+                    <input type="text" id="item-nombre_mp_me" required>
+                    <span class="search-icon" onclick="abrirModal()">🔍</span>
+                </div>
             </div>
             <div class="form-group"><label>Presentación</label><input type="text" id="item-presentacion"></div>
             <div class="form-group"><label>Lote #</label><input type="text" id="item-lote" required></div>
@@ -127,8 +149,7 @@
                 <th class="action-col">Acción</th>
             </tr>
         </thead>
-        <tbody id="itemsPreviewBody">
-            </tbody>
+        <tbody id="itemsPreviewBody"></tbody>
     </table>
     <p id="emptyCartMsg">No se han agregado productos.</p>
 </div>
@@ -141,17 +162,21 @@
 </div>
 
 <div id="searchModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="cerrarModal()">&times;</span>
+        <h2>Buscar Producto</h2>
+        <input type="text" id="modal-search" onkeyup="filtrarProductos()" placeholder="Buscar..." style="width:100%; padding:10px; margin-bottom:15px;">
+        <div style="max-height:300px; overflow-y:auto;">
+            <table id="modal-results-table"><thead><tr><th>Código</th><th>Nombre</th></tr></thead><tbody id="modal-results-body"></tbody></table>
+        </div>
     </div>
-
+</div>
 
 <script>
     const API_URL = 'http://localhost:3000/api';
-    
-    // Este array guardará los productos temporalmente (el "carrito")
     let itemsAgregados = [];
-    let allProducts = []; // Para tu modal de búsqueda
+    let allProducts = [];
 
-    // --- REFERENCIAS A ELEMENTOS DEL DOM ---
     const addItemBtn = document.getElementById('addItemBtn');
     const saveReceptionBtn = document.getElementById('saveReceptionBtn');
     const itemsPreviewTable = document.getElementById('itemsPreview');
@@ -159,7 +184,6 @@
     const emptyCartMsg = document.getElementById('emptyCartMsg');
     const feedbackMessage = document.getElementById('feedback-message');
     
-    // Formulario de entrada de productos
     const productForm = {
         codigo_mp: document.getElementById('item-cod_mp_me'),
         nombre_mp: document.getElementById('item-nombre_mp_me'),
@@ -171,11 +195,10 @@
         total_etiquetas: document.getElementById('item-total_etiquetas')
     };
 
-    // --- INICIALIZACIÓN (Como tu código anterior) ---
     document.addEventListener('DOMContentLoaded', () => {
         loadNextQC();
         loadResponsables();
-        loadProducts(); // Para el modal
+        loadProducts();
         setupDates();
         setupQCToggle();
     });
@@ -208,7 +231,6 @@
     function setupDates() {
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('fecha_recepcion').value = today;
-        // Poner fecha por defecto en el formulario de item
         const future = new Date(); future.setMonth(future.getMonth() + 6);
         document.getElementById('item-fecha_vencimiento').value = future.toISOString().split('T')[0];
     }
@@ -223,9 +245,39 @@
         });
     }
 
-    // --- ACCIÓN DEL BOTÓN 1: "AGREGAR PRODUCTO" ---
+    // --- MODAL FUNCIONES ---
+    const modal = document.getElementById('searchModal');
+    function abrirModal() { 
+        modal.style.display = 'block'; 
+        renderProducts(allProducts);
+        document.getElementById('modal-search').focus();
+    }
+    function cerrarModal() { modal.style.display = 'none'; }
+    
+    function renderProducts(list) {
+        const tbody = document.getElementById('modal-results-body');
+        tbody.innerHTML = '';
+        list.forEach(p => {
+            tbody.innerHTML += `<tr onclick="selectProduct('${p.codigo_referencia}', '${p.nombre_producto}')"><td>${p.codigo_referencia}</td><td>${p.nombre_producto}</td></tr>`;
+        });
+    }
+    
+    function filtrarProductos() {
+        const term = document.getElementById('modal-search').value.toLowerCase();
+        renderProducts(allProducts.filter(p => p.codigo_referencia.toLowerCase().includes(term) || p.nombre_producto.toLowerCase().includes(term)));
+    }
+
+    function selectProduct(cod, nom) {
+        // Asigna a los campos con prefijo item-
+        document.getElementById('item-cod_mp_me').value = cod;
+        document.getElementById('item-nombre_mp_me').value = nom;
+        document.getElementById('item-lote').focus();
+        cerrarModal();
+    }
+    window.onclick = (e) => { if (e.target == modal) cerrarModal(); }
+
+    // --- LOGICA CARRITO ---
     addItemBtn.addEventListener('click', () => {
-        // 1. Lee los valores del formulario de producto
         const newItem = {
             codigo_mp: productForm.codigo_mp.value,
             nombre_mp: productForm.nombre_mp.value,
@@ -237,16 +289,13 @@
             total_etiquetas: parseInt(productForm.total_etiquetas.value)
         };
 
-        // 2. Valida que los campos no estén vacíos
         if (!newItem.codigo_mp || !newItem.lote || isNaN(newItem.cantidad_peso)) {
             alert('El Código, Lote y Cantidad son obligatorios.');
             return;
         }
 
-        // 3. Agrega el producto al array
         itemsAgregados.push(newItem);
 
-        // 4. Limpia los campos del formulario de producto para el siguiente item
         productForm.codigo_mp.value = '';
         productForm.nombre_mp.value = '';
         productForm.presentacion.value = '';
@@ -254,26 +303,21 @@
         productForm.cantidad_peso.value = '';
         productForm.total_unidades_peso.value = '';
         productForm.total_etiquetas.value = '';
-        productForm.codigo_mp.focus(); // Pone el cursor en el primer campo
+        productForm.codigo_mp.focus();
 
-        // 5. Actualiza la tabla visual
         renderTablaItems();
     });
 
-    // --- FUNCIÓN PARA ACTUALIZAR LA TABLA VISUAL ---
     function renderTablaItems() {
-        itemsPreviewBody.innerHTML = ''; // Limpia la tabla
-
+        itemsPreviewBody.innerHTML = '';
         if (itemsAgregados.length === 0) {
             itemsPreviewTable.classList.add('hidden');
             emptyCartMsg.classList.remove('hidden');
             return;
         }
-        
         itemsPreviewTable.classList.remove('hidden');
         emptyCartMsg.classList.add('hidden');
 
-        // Vuelve a dibujar la tabla con los items del array
         itemsAgregados.forEach((item, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -287,29 +331,22 @@
         });
     }
 
-    // --- FUNCIÓN PARA QUITAR UN ITEM DEL "CARRITO" ---
     function removerItem(index) {
         if (confirm('¿Estás seguro de que deseas quitar este producto?')) {
-            itemsAgregados.splice(index, 1); // Quita el item del array
-            renderTablaItems(); // Vuelve a dibujar la tabla
+            itemsAgregados.splice(index, 1);
+            renderTablaItems();
         }
     }
 
-
-    // --- ACCIÓN DEL BOTÓN 2: "GUARDAR RECEPCIÓN COMPLETA" ---
     saveReceptionBtn.addEventListener('click', async () => {
-        
-        // 1. Validar que haya al menos un producto
         if (itemsAgregados.length === 0) {
             alert('Debe agregar al menos un producto antes de guardar.');
             return;
         }
 
-        // 2. Recolectar datos del Encabezado (Formulario 1)
         const headerData = {
             n_control_qc: document.getElementById('n_control_qc').value,
             responsable_qc: document.getElementById('responsable_qc').value,
-            resp_aprob_qc: document.getElementById('responsable_qc').value,
             fecha_recepcion: document.getElementById('fecha_recepcion').value,
             n_orden_compra: document.getElementById('n_orden_compra').value,
             fecha_oc: document.getElementById('fecha_oc').value,
@@ -324,26 +361,19 @@
             tratamiento_nc: document.getElementById('tratamiento_nc').value
         };
         
-        // Validar campos de encabezado
-        if (!headerData.resp_aprob_qc || !headerData.tipo_insumo) {
+        if (!headerData.responsable_qc || !headerData.tipo_insumo) {
             alert('Por favor, complete todos los campos del encabezado (Responsable, Tipo Insumo).');
             return;
         }
 
-        // 3. Preparar el paquete final de datos
-        const dataParaEnviar = {
-            header: headerData,
-            items: itemsAgregados 
-        };
+        const dataParaEnviar = { header: headerData, items: itemsAgregados };
 
-        // 4. Enviar al Backend (Aquí conectamos con el Paso 3)
         feedbackMessage.style.display = 'block';
         feedbackMessage.className = '';
         feedbackMessage.textContent = 'Guardando recepción completa...';
         saveReceptionBtn.disabled = true;
 
         try {
-            // Esta es la nueva ruta que debemos crear en el backend
             const response = await fetch(`${API_URL}/recepciones/completa`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -351,19 +381,16 @@
             });
 
             const result = await response.json();
-            if (!response.ok) {
-                throw new Error(result.message || 'Error del servidor');
-            }
+            if (!response.ok) throw new Error(result.message || 'Error del servidor');
 
             feedbackMessage.textContent = `¡Recepción guardada con éxito! Consecutivo: ${result.n_control_qc}`;
             feedbackMessage.className = 'success';
             
-            // Limpiar todo
             itemsAgregados = [];
             renderTablaItems();
             document.getElementById('recepcionFormHeader').reset();
-            setupDates(); // Reiniciar fechas
-            loadNextQC(); // Cargar nuevo consecutivo
+            setupDates();
+            loadNextQC();
 
         } catch (error) {
             console.error('Error al guardar recepción:', error);
